@@ -1,19 +1,20 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale-1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Planora - Dashboard</title>
-    <link rel="stylsheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
 
 <body>
     <header class="navbar">
-        <a class="logo" href=""index.html">Planora</a>
+        <a class="logo" href="index.html">Planora</a>
 
-        <nav class="nav-links">
-            <a class="active" href="index.html">Dashboard</a>
+        <nav class="nav-links" aria-label="Main navigation">
+            <a class="active" href="index.html" aria-current="page">Dashboard</a>
             <a href="tasks.html">Tasks</a>
             <a href="schedule.html">Schedule</a>
             <a href="pomodoro.html">Pomodoro</a>
@@ -24,70 +25,68 @@
         <button
             class="profile"
             id="account-button"
+            type="button"
             aria-label="Sign up or log in"
             title="Sign up or log in"
-        >
-            U
-        </button>
-
+        >U</button>
     </header>
 
-<main class="container">
-    <section class="welcome">
-        <h1>Welcome to Planora!</h1>
-        <p>Plan your day, manage your tasks, and track your progress</p>
-    </section>
+    <main class="container">
+        <section class="welcome">
+            <h1>Welcome to Planora!</h1>
+            <p>Plan your day, manage your tasks, and track your progress</p>
+        </section>
 
-    <section class="summary">
-        <article class="card">
-            <p>Tasks today</p>
-            <h2 id="total-count">0</h2>
-        </article>
+        <section class="summary" aria-label="Task summary">
+            <article class="card">
+                <p>Tasks today</p>
+                <h2 id="total-count">0</h2>
+            </article>
 
-        <article class="card">
-            <p>Completed</p>
-            <h2 id="completed-count">0</h2>
-        </article>
+            <article class="card">
+                <p>Completed</p>
+                <h2 id="completed-count">0</h2>
+            </article>
 
-        <article class="card">
-            <p>Remaining</p>
-            <h2 id="remaining-count">0</h2>
-        </article>
-    </section>
+            <article class="card">
+                <p>Remaining</p>
+                <h2 id="remaining-count">0</h2>
+            </article>
+        </section>
 
-    <section class="card task-section">
-        <div class="section-heading">
-            <h2>Today's tasks</h2>
-            <button id="add-task-button">
-                + Add task
-            </button>
-        </div>
+        <section class="card task-section">
+            <div class="section-heading">
+                <h2>Today's tasks</h2>
+                <button id="add-task-button" type="button">
+                    + Add task
+                </button>
+            </div>
 
-        <form id="task-form" class="task-form" hidden>
-            <label for="task-input">Task name</label>
-            <input
-                type="text"
-                id="task-input"
-                placeholder="Enter a task..."
-                required
-            >
-            <button type="submit">Save task</button>
-        </form>
+            <form id="task-form" class="task-form" hidden>
+                <label for="task-input">Task name</label>
+                <input
+                    type="text"
+                    id="task-input"
+                    placeholder="Enter a task..."
+                    required
+                >
+                <button type="submit">Save task</button>
+            </form>
 
-        <ul id="task-list" class="task-list">
-            <li class="empty-message">
-                No tasks yet. Add your first task!
-            </li>
-        </ul>
-    </section>
+            <ul id="task-list" class="task-list">
+                <li class="empty-message">
+                    No tasks yet. Add your first task!
+                </li>
+            </ul>
+        </section>
 
-    <section class="card deadlines">
-        <h2>Upcoming deadlines</h2>
-        <p>
-            <strong>Stay organised</strong>
-            <span>Add tasks to start planning your day.</span>
-        </p>
-    </section>
-</main>
+        <section class="card deadlines">
+            <h2>Upcoming deadlines</h2>
+            <p>
+                <strong>Stay organised</strong>
+                <span>Add tasks to start planning your day.</span>
+            </p>
+        </section>
+    </main>
 </body>
 </html>
