@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planora - Pomodoro</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <header class="navbar">
+        <a class="logo" href="index.html">Planora</a>
+        <nav class="nav-links" aria-label="Main navigation">
+            <a href="index.html">Dashboard</a>
+            <a href="tasks.html">Tasks</a>
+            <a href="schedule.html">Schedule</a>
+            <a class="active" href="pomodoro.html" aria-current="page">Pomodoro</a>
+            <a href="progress.html">Progress</a>
+            <a href="settings.html">Settings</a>
+        </nav>
+        <button class="profile" id="account-button" type="button"
+            aria-label="Sign up or log in">U</button>
+    </header>
+
+    <main class="container">
+        <section class="welcome">
+            <h1>Focus Mode</h1>
+            <p>Work in focused intervals and take breaks when you need them.</p>
+        </section>
+
+        <section class="card">
+            <div style="text-align: center;">
+                <p id="timer-mode">Focus session</p>
+                <h2 id="timer-display"
+                    style="font-size: 64px; margin: 24px 0;">25:00</h2>
+
+                <button id="timer-start" type="button">Start</button>
+                <button id="timer-reset" type="button">Reset</button>
+                <button id="timer-break" type="button">Take a break</button>
+
+                <p id="timer-message">Ready when you are!</p>
+            </div>
+        </section>
+
+        <section class="card deadlines">
+            <h2>How it works</h2>
+            <p>Focus for 25 minutes, then take a 5 minute break.</p>
+            <p>After four focus sessions, take a longer break.</p>
+        </section>
+    </main>
+</body>
+</html>

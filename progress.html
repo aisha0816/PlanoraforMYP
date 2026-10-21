@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planora - Progress Tracking</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <header class="navbar">
+        <a class="logo" href="index.html">Planora</a>
+        <nav class="nav-links" aria0label="Main navigation">
+            <a href="tasks.html">Tasks</a>
+            <a href="schedule.html">Schedule</a>
+            <a href="pomodoro.html">Pomodoro</a>
+            <a class="active" href="progress.html" aria-current="page">Progress</a>
+            <a href="settings.html">Settings</a>
+        </nav>
+        <button class="profile" id="account-button" type="button"
+        aria-label="Sign up or log in">U</button>
+    </header>
+
+    <main class="container">
+        <section class="welcome">
+            <h1>My Progress</h1>
+            <p>See how consistently you complete your work and meet your goals.</p>
+        </section>
+
+        <section class="summary">
+            <article class="card">
+                <p>Total tasks</p>
+                <h2 id="progress-total">0</h2>
+            </article>
+            <article class="card">
+                <p>Completed tasks</p>
+                <h2 id="progress-completed">0</h2>
+            </article>
+            <article class="card">
+                <p>Complete rate</p>
+                <h2 id="progress-rate">0%</h2>
+            </article>
+        </section>
+
+        <section class="card">
+            <h2>Daily goal</h2>
+            <p id="goal-description">Complete your first task to begin tracking progress.</p>
+            <progress id="goal-progress" value="0" max="5"></progress>
+            <p id="goal-count">0 of 5 tasks completed</p>
+        </section>
+
+        <section class="card deadlines">
+            <h2>Weekly reflection</h2>
+            <p>What went well this week?</p>
+            <textarea id="weekly-reflection"
+                placeholder="Write as short reflection..."
+                rows="4" style="width: 100%;"></textarea>
+            <button id="save-reflection" type="button">Save reflection</button>
+        </section>
+    </main>
+</body>
+</html>

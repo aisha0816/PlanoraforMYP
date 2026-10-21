@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planora - Schedule</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <header class="navbar">
+        <a class="logo" href="index.html">Planora</a>
+        <nav class="logo" aria-label="Main navigation">
+            <a href="index.html">Dashboard</a>
+            <a href="tasks.html">Tasks</a>
+            <a class="active" href="schedule.html" aria.current="page">Schedule</a>
+            <a href="pomodoro.html">Pomodoro</a>
+            <a href="progress.html">Progress</a>
+            <a href="settings.html">Settings</a>
+        </nav>
+        <button class="profile" id="account-button" type="button"
+            aria-label="Sign up or log in">U</button>
+    </header>
+
+    <main class="container">
+        <section class="welcome">
+            <h1>My Schedule</h1>
+            <p>Plan your time and create a balanced study routine.</p>
+        </section>
+
+        <section class="card">
+            <h2>Plan a study session</h2>
+            <form id="schedule-form" class="task-form">
+                <label for="session-title">Activity</label>
+                <input id="session title" type="text"
+                    placeholder="e.g. Maths revision" required>
+
+                <label for="session-date">Date</label>
+                <input id="session-date" type="date" required>
+
+                <label for="session-start">Start time</label>
+                <input id="session-start" type="time" required>
+
+                <label for="session-end">End time</label>
+                <input id="session-end" type="time" required>
+
+                <button type="submit">Add session</button>
+            </form>
+        </section>
+
+        <section class="card deadlines">
+            <h2>Upcoming sessions</h2>
+            <ul id="schedule-list">
+                <li class="empty-message">No sessions planned yet.</li>
+            </ul>
+        </section>
+    </main>
+</body>
+</html>

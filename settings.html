@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planora - Settings</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <header class="navbar">
+        <a class="logo" href="index.html">Planora</a>
+        <nav class="nav-links" aria-label="Main navigation">
+            <a href="index.html">Dashboard</a>
+            <a href="tasks.html">Tasks</a>
+            <a href="schedule.html">Schedule</a>
+            <a href="pomodoro.html">Pomodoro</a>
+            <a href="progress.html">Progress</a>
+            <a class="active" href="settings.html" aria-current="page">Settings</a>
+        </nav>
+        <button class="profile" id="account-button" type="button"
+            aria-label="Sign up or log in">U</button>
+    </header>
+
+    <main class="container">
+        <section class="welcome">
+            <h1>Settings</h1>
+            <p>Customise Planora to suit your study habits</p>
+        </section>
+
+        <section class="card">
+            <h2>Study preferences</h2>
+
+            <form id="settings-form" class="task-form">
+                <label for="focus-duration">Focus duration (minutes)</label>
+                <input id="focus-duration" type="number"
+                    min="1" max="120" value="25" required>
+
+                <label for="break-duration">Short break (minutes)</label>
+                <input id="break-duration" type="number"
+                    min="1" max="60" value="5" required>
+
+                <label for="daily-goal">Daily task goal</label>
+                <input id="daily-goal" type="number"
+                    min="1" max="100" value="5" required>
+
+                <label for="theme-choice">Colour theme</label>
+                <select id="theme-choice">
+                    <option value="blue">Blue and white</option>
+                    <option value="light">Light and neutral</option>
+                    <option value="dark">Black and white</option>
+                </select>
+
+                <button type="submit">Save settings</button>
+            </form>
+
+            <p id="settings-message" role="status"></p>
+        </section>
+    </main>
+</body>
+</html>
