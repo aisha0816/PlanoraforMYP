@@ -1126,13 +1126,13 @@ label {
     padding: 28px;
 }
 
-.modal content h2 {
+.modal-content h2 {
     margin-top: 0;
     margin-bottom: 8px;
 
 }
 
-.modal content > p {
+.modal-content > p {
     color: var(--text-muted)
 }
 
