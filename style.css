@@ -1091,6 +1091,10 @@ label {
     }
 }
 
+#account-modal[hidden] {
+    display: none !important;
+}
+
 .modal {
     position: fixed;
     inset: 0;
