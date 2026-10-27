@@ -66,5 +66,60 @@
             </ul>
         </section>
     </main>
+
+    <div id="account-model" class="modal" hidden>
+        <div class="modal=backdrop" id="modal-backdrop"></div>
+    
+    <section class="modal-content card"
+        role="dialog"
+        aria-model="true"
+        aria-labelledby="account-title">
+
+        <button id="close-account" type="button"
+            class="modal-close" aria-label="Close account panel">
+            &times;
+        </button>
+
+        <h2 id="account-title">Welcome to Planora</h2>
+        <p id="account-description">
+            Sign in or create your account to get started.
+        </p>
+
+        <div class="auth-tabs">
+            <button id="show-signup" type="button">Sign up</button>
+            <button id="show-login" type="button">Log in</button>
+        </div>
+
+        <form id="signup-form">
+            <label for="signup-name">Your name</label>
+            <label id="signup-name" type="text"
+                autocomplete="name" required>
+
+            <label for="signup-email">Email</label>
+            <input id="signup-email" type="email"
+                autocomplete="name" required>
+
+            <label for="signup-password">Password</label>
+            <input id="signup-password" type="password"
+                autocomplete="new-password" minlength="6" required>
+
+            <button type="submit">Create account</button>
+        </form>
+
+        <form id="login-form" hidden>
+            <label for="login-email">Email</label>
+            <input id="login-email" type="email"
+                autocomplete="email" required>
+            
+            <label for="login-password">Password</label>
+            <label id="login-password" type="password"
+                autocomplete="current-password" required>
+            
+            <button type="submit">Log in</button>
+        </form>
+
+        <p id="auth-message" rel="status"></p>
+    </section>
+    </div>
 </body>
 </html>
