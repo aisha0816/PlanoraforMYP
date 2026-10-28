@@ -1,12 +1,12 @@
 const SUPABASE_URL = "https://oxyiaqomqvzmgrsagroc.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_4A95N9DBr72t7DStUrOrHw__Jn9f_gz"
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_4A95N9DBr72t7DStUrOrHw__Jn9f_gz";
 
 const supabaseClient = supabase.createClient(
     SUPABASE_URL,
     SUPABASE_PUBLISHABLE_KEY
 );
 
-console.log("Supabase client initialised.")
+console.log("Supabase client initialised!");
 
 const accountButton = document.getElementById("account-button");
 const accountModal = document.getElementById("account-modal");
@@ -27,7 +27,7 @@ if (accountButton && accountModal) {
     const authMessage = document.getElementById("auth-message");
 
     function closeAccountModal() {
-        accountModal.hidden = false;
+        accountModal.hidden = true;
     }
 
     accountButton.addEventListener("click", () => {
@@ -48,29 +48,34 @@ if (accountButton && accountModal) {
         loginForm.hidden = true;
         authMessage.textContent = "";
 
-        accountTitle.textContent = "Create your own account";
+        accountTitle.textContent = "Create your account";
         accountDescription.textContent =
             "Join Planora and organise your learning.";
     });
 
-    showLoginButton.addEventListener("click", () => {
+    showLoginButton?.addEventListener("click", () => {
         signupForm.hidden = true;
         loginForm.hidden = false;
+        authMessage.textContent = "";
 
         accountTitle.textContent = "Welcome back!";
         accountDescription.textContent =
             "Log in to access your Planora account.";
     });
 
-    signupForm.addEventListener("submit", async (event) => {
+    signupForm?.addEventListener("submit", async (event) => {
         event.preventDefault();
-        authMessage.textContent = "Creating your account...";
-        
-        const name = document.getElementById("signup-name").value.trial();
-        const email = document.getElementById("signup-email").value.trial();
-        const password = document.getElementById("signup-password").value;
 
-        const { data, error } = await supabaseClient.with.signUp({
+        authMessage.textContent = "Creating your account...";
+
+        const name = document
+            .getElementById("signup-name").value.trim();
+        const email = document
+            .getElementById("signup-email").value.trim();
+        const password = document
+            .getElementById("signup-password").value;
+
+        const { data, error } = await supabaseClient.auth.signUp({
             email,
             password,
             options: {
@@ -90,12 +95,15 @@ if (accountButton && accountModal) {
             : "Account created! Check your email to confirm your account.";
     });
 
-    loginForm.addEventListener("submit", async (event) => {
+    loginForm?.addEventListener("submit", async (event) => {
         event.preventDefault();
+
         authMessage.textContent = "Logging in...";
 
-        const email = document.getElementById("login-email").value.trial();
-        const password = document.getElementById("login-password").value;
+        const email = document
+            .getElementById("login-email").value.trim();
+        const password = document
+            .getElementById("login-password").value;
 
         const { error } = await supabaseClient.auth.signInWithPassword({
             email,
@@ -107,9 +115,11 @@ if (accountButton && accountModal) {
             return;
         }
 
+        const { data } = await supabaseClient.auth.getUser();
+
         authMessage.textContent = "Logged in successfully!";
         accountButton.textContent =
-            (await supabaseClient.auth.getUser()).data.user
-                ?.user_metadata?.full_name?.charAt(0)?.toUpperCase() || "U";
+            data.user?.user_metadata?.full_name?.charAt(0)?.toUpperCase()
+            || "U";
     });
 }
