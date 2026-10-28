@@ -10,40 +10,58 @@ console.log("Supabase client initialised.")
 
 const accountButton = document.getElementById("account-button");
 const accountModal = document.getElementById("account-modal");
-const closeAccountButton = document.getElementById("close-account");
-const modalBackdrop = document.getElementById("modal-backdrop");
 
-const signupForm = document.getElementById("signup-form");
-const showLogInButton = document.getElementById("login-form");
+if (accountButton && accountModal) {
+    const closeAccountButton =
+        document.getElementById("close-account");
+    const modalBackdrop =
+        document.getElementById("modal-backdrop");
 
-const accountTitle = document.getElementById("account-title");
-const accountDescription = document.getElementById("account-description");
+    const signupForm = document.getElementById("signup-form");
+    const loginForm = document.getElementById("login-form");
 
-accountButton.addEventListener("click", () => {
-    accountModal.hidden = false;
-});
+    const showSignupButton =
+        document.getElementById("show-signup");
+    const showLoginButton =
+        document.getElementById("show-login");
 
-function closeAccountModal() {
-    accountModal.hidden = true;
+    const accountTitle = document.getElementById("account-title");
+    const accountDescription =
+        document.getElementById("account-description");
+
+    accountButton.addEventListener("click", () => {
+        accountModal.hidden = false;
+    });
+
+    function closeAccountModal() {
+        accountModal.hidden = false;
+    }
+
+    closeAccountButton?.addEventListener(
+        "click",
+        closeAccountModal
+    );
+
+    modalBackdrop?.addEventListener(
+        "click",
+        closeAccountModal
+    );
+
+    showSignupButton?.addEventListener("click", () => {
+        signupForm.hidden = false;
+        loginForm.hidden = true;
+
+        accountTtile.textContent = "Create your own account";
+        accountDescription.textContent =
+            "Join Planora and organise your learning.";
+    });
+
+    showLoginButton?.addEventListener("click", () => {
+        signupForm.hidden = true;
+        loginForm.hidden = false;
+
+        accountTitle.textContent = "Welcome back!";
+        accountDescription.textContent =
+            "Log in to access your Planora account.";
+    })
 }
-
-showSignupButton.addEventListener("click", closeAccountModal);
-modalBackdrop.addEventListener("click", closeAccountModal);
-
-showSignupButton.addEventListener("click", () => {
-    signupForm.hidden = false;
-    loginForm.hidden = true;
-
-    accountTitle.textContent = "Create your account";
-    accountDescription.textContent =
-        "Join Planora and organise your learning.";
-});
-
-showLogInButton.addEventListener("click", () => {
-    signupForm.hiddden = true;
-    loginForm.hidden = false;
-
-    accountTitle.textContent="Welcome back!";
-    accountDescription.textContent =
-        "Log in to access your Planora account.";
-});
