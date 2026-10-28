@@ -1,43 +1,41 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#F5F8FD">
-    <title>Planora - Settings</title>
+    <title>Settings | Planora</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js" defer></script>
 </head>
 <body>
-    <header class="navbar">
-        <a class="logo" href="index.html">Planora</a>
-        <nav class="nav-links" aria-label="Main navigation">
-            <a href="index.html">Dashboard</a>
+    <nav class="navbar">
+        <a href="index.html" class="logo">Planora</a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
             <a href="tasks.html">Tasks</a>
             <a href="schedule.html">Schedule</a>
             <a href="pomodoro.html">Pomodoro</a>
             <a href="progress.html">Progress</a>
-            <a class="active" href="settings.html" aria-current="page">Settings</a>
-        </nav>
-        <button class="profile" id="account-button" type="button"
-            aria-label="Sign up or log in">U</button>
-    </header>
+            <a href="settings.html" class="active">Settings</a>
+        </div>
+        <button type="button" id="account-button" class="secondary-button">Account</button>
+    </nav>
 
     <main class="container settings-page">
-        <section class="welcome">
+        <header class="welcome-section">
             <h1>Settings</h1>
-            <p>Personalise your study environment and focus routine.</p>
-        </section>
+            <p>Personalise your Planora experience and customise your focus sessions.</p>
+        </header>
 
-        <section class="card settings-card">
-            <div class="settings-section-heading">
-                <h2>Appearance</h2>
-                <p>Choose how Planora looks across all your pages.</p>
-            </div>
+        <form id="settings-form" class="settings-form">
 
-            <form id="settings-form">
+            <section class="card settings-group">
+                <div class="settings-section-heading">
+                    <h2>Appearance</h2>
+                    <p>Choose a theme that feels comfortable to use.</p>
+                </div>
+
                 <div class="settings-field">
                     <label for="theme-choice">Colour theme</label>
                     <select id="theme-choice" name="theme">
@@ -46,151 +44,102 @@
                         <option value="black">Black and white</option>
                     </select>
                 </div>
+            </section>
 
+            <section class="card settings-group">
                 <div class="settings-section-heading">
-                    <h2>Pomodoro timer</h2>
-                    <p>Customise your focus sessions and breaks.</p>
+                    <h2>Pomodoro Timer</h2>
+                    <p>Set the length of your focus sessions and breaks.</p>
                 </div>
 
                 <div class="settings-field">
-                    <label for="focus-duration">Focus duration</label>
-                    <div class="settings-input-unit">
-                        <input id="focus-duration" name="focusDuration"
-                            type="number" min="1" max="120"
-                            value="25" required>
-                        <span>minutes</span>
-                    </div>
+                    <label for="focus-duration">Focus duration (minutes)</label>
+                    <input type="number" id="focus-duration" name="focus-duration" min="1" max="120" value="25">
                 </div>
 
                 <div class="settings-field">
-                    <label for="break-duration">Short break duration</label>
-                    <div class="settings-input-unit">
-                        <input id="break-duration" name="breakDuration"
-                            type="number" min="1" max="60"
-                            value="5" required>
-                        <span>minutes</span>
-                    </div>
+                    <label for="break-duration">Short break (minutes)</label>
+                    <input type="number" id="break-duration" name="break-duration" min="1" max="60" value="5">
                 </div>
 
                 <div class="settings-field">
-                    <label for="long-break-duration">Long break duration</label>
-                    <div class="settings-input-unit">
-                        <input id="long-break-duration" name="longBreakDuration"
-                            type="number" min="1" max="60"
-                            value="15" required>
-                        <span>minutes</span>
-                    </div>
+                    <label for="long-break-duration">Long break (minutes)</label>
+                    <input type="number" id="long-break-duration" name="long-break-duration" min="1" max="60" value="15">
                 </div>
 
                 <div class="settings-field">
-                    <label for="sessions-before-long-break">
-                        Focus sessions before a long break
-                    </label>
-                    <input id="sessions-before-long-break"
-                        name="sessionsBeforeLongBreak"
-                        type="number" min="2" max="10"
-                        value="4" required>
+                    <label for="sessions-before-long-break">Focus sessions before a long break</label>
+                    <input type="number" id="sessions-before-long-break" name="sessions-before-long-break" min="2" max="10" value="4">
                 </div>
+            </section>
 
+            <section class="card settings-group">
                 <div class="settings-section-heading">
-                    <h2>Timer behaviour</h2>
-                    <p>Choose what happens when a timer finishes.</p>
+                    <h2>Timer Behaviour</h2>
+                    <p>Choose what happens when a focus session or break ends.</p>
                 </div>
 
-                <label class="settings-toggle" for="auto-start-breaks">
-                    <span>
-                        <strong>Automatically start breaks</strong>
-                        <small>Begin the break as soon as a focus session ends.</small>
-                    </span>
-                    <input id="auto-start-breaks" name="autoStartBreaks"
-                        type="checkbox">
+                <label class="settings-checkbox" for="auto-start-breaks">
+                    <input type="checkbox" id="auto-start-breaks" name="auto-start-breaks">
+                    <span>Automatically start breaks</span>
                 </label>
 
-                <label class="settings-toggle" for="auto-start-focus">
-                    <span>
-                        <strong>Automatically start focus sessions</strong>
-                        <small>Begin focusing when a break ends.</small>
-                    </span>
-                    <input id="auto-start-focus" name="autoStartFocus"
-                        type="checkbox">
+                <label class="settings-checkbox" for="auto-start-focus">
+                    <input type="checkbox" id="auto-start-focus" name="auto-start-focus">
+                    <span>Automatically start the next focus session</span>
                 </label>
 
-                <label class="settings-toggle" for="sound-notifications">
-                    <span>
-                        <strong>Timer sound alerts</strong>
-                        <small>Play an alert when a timer finishes.</small>
-                    </span>
-                    <input id="sound-notifications" name="soundNotifications"
-                        type="checkbox" checked>
+                <label class="settings-checkbox" for="sound-notifications">
+                    <input type="checkbox" id="sound-notifications" name="sound-notifications" checked>
+                    <span>Enable sound notifications</span>
                 </label>
+            </section>
 
-                <div class="settings-actions">
-                    <button type="submit" id="save-settings">
-                        Save settings
-                    </button>
-                    <button type="button" class="secondary"
-                        id="reset-settings">
-                        Reset to defaults
-                    </button>
-                </div>
-            </form>
+            <div class="settings-actions">
+                <button type="submit" id="save-settings">Save Settings</button>
+                <button type="button" id="reset-settings" class="secondary-button">Reset to Defaults</button>
+            </div>
 
             <p id="settings-message" role="status" aria-live="polite"></p>
-        </section>
+        </form>
     </main>
 
     <div id="account-modal" class="modal" hidden>
-        <div class="modal-backdrop" id="modal-backdrop"></div>
+        <div class="modal-content">
+            <button type="button" id="close-account-modal" class="modal-close" aria-label="Close account window">&times;</button>
+            <h2>Account</h2>
 
-        <section class="modal-content card" role="dialog" aria-modal="true"
-            aria-labelledby="account-title"
-            aria-describedby="account-description">
+            <div id="logged-out-view">
+                <h3>Create an account</h3>
+                <form id="signup-form">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" required>
 
-            <button id="close-account" type="button" class="modal-close"
-                aria-label="Close account panel">&times;</button>
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" required minlength="6">
 
-            <h2 id="account-title">Create your account</h2>
-            <p id="account-description">
-                Enter your details to get started with Planora.
-            </p>
+                    <button type="submit">Sign Up</button>
+                </form>
 
-            <div class="auth-tabs">
-                <button id="show-signup" type="button">Sign up</button>
-                <button id="show-login" type="button">Log in</button>
+                <h3>Log in</h3>
+                <form id="login-form">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" required>
+
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required>
+
+                    <button type="submit">Log In</button>
+                </form>
             </div>
 
-            <form id="signup-form">
-                <label for="signup-name">Your name</label>
-                <input id="signup-name" name="name" type="text"
-                    autocomplete="name" placeholder="Enter your name" required>
+            <div id="logged-in-view" hidden>
+                <p id="account-email"></p>
+                <button type="button" id="logout-button">Log Out</button>
+            </div>
 
-                <label for="signup-email">Email</label>
-                <input id="signup-email" name="email" type="email"
-                    autocomplete="email" placeholder="Enter your email" required>
-
-                <label for="signup-password">Password</label>
-                <input id="signup-password" name="password" type="password"
-                    autocomplete="new-password" minlength="6"
-                    placeholder="Create a password" required>
-
-                <button type="submit">Create account</button>
-            </form>
-
-            <form id="login-form" hidden>
-                <label for="login-email">Email</label>
-                <input id="login-email" name="email" type="email"
-                    autocomplete="email" placeholder="Enter your email" required>
-
-                <label for="login-password">Password</label>
-                <input id="login-password" name="password" type="password"
-                    autocomplete="current-password"
-                    placeholder="Enter your password" required>
-
-                <button type="submit">Log in</button>
-            </form>
-
-            <p id="auth-message" role="status" aria-live="polite"></p>
-        </section>
+            <p id="account-message" role="status" aria-live="polite"></p>
+        </div>
     </div>
 </body>
 </html>
