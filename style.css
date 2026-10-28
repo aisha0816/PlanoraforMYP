@@ -1185,3 +1185,60 @@ label {
 #login-form[hidden] {
     display: none !important;
 }
+
+#schedule-form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+}
+
+#schedule-form label {
+    width: 100%;
+    flex: none;
+    margin-bottom: 0;
+}
+
+#schedule-form button {
+    align-self: flex-start;
+    width: auto;
+}
+
+#schedule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 20px;
+}
+
+#schedule-list li {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 8px;
+    width: 100%;
+    margin: 0;
+    padding: 18px;
+}
+
+#schedule-list li h3 {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.4;
+}
+
+#schedule-list li p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+#schedule-list li button {
+    margin: 6px 0 0;
+}
+
+@media (max-width: 650px) {
+    #schedule-form button {
+        width: 100%;
+    }
+}
