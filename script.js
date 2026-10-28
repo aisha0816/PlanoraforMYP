@@ -14,20 +14,58 @@ const accountModal = document.getElementById("account-modal");
 if (accountButton && accountModal) {
     const closeButton = document.getElementById("close-account");
     const backdrop = document.getElementById("modal-backdrop");
-
     const signupForm = document.getElementById("signup-form");
     const loginForm = document.getElementById("login-form");
-
     const showSignupButton = document.getElementById("show-signup");
     const showLoginButton = document.getElementById("show-login");
-
     const accountTitle = document.getElementById("account-title");
-    const accountDescription =
-        document.getElementById("account-description");
+    const accountDescription = document.getElementById("account-description");
     const authMessage = document.getElementById("auth-message");
+
+    function showMessage(message) {
+        if (authMessage) {
+            authMessage.textContent = message;
+        }
+    }
 
     function closeAccountModal() {
         accountModal.hidden = true;
+    }
+
+    function showSignup() {
+        if (!signupForm || !loginForm) return;
+
+        signupForm.hidden = false;
+        loginForm.hidden = true;
+
+        if (accountTitle) {
+            accountTitle.textContent = "Create your account";
+        }
+
+        if (accountDescription) {
+            accountDescription.textContent =
+                "Join Planora and organise your learning.";
+        }
+
+        showMessage("");
+    }
+
+    function showLogin() {
+        if (!signupForm || !loginForm) return;
+
+        signupForm.hidden = true;
+        loginForm.hidden = false;
+
+        if (accountTitle) {
+            accountTitle.textContent = "Welcome back!";
+        }
+
+        if (accountDescription) {
+            accountDescription.textContent =
+                "Log in to access your Planora account.";
+        }
+
+        showMessage("");
     }
 
     accountButton.addEventListener("click", () => {
@@ -36,6 +74,8 @@ if (accountButton && accountModal) {
 
     closeButton?.addEventListener("click", closeAccountModal);
     backdrop?.addEventListener("click", closeAccountModal);
+    showSignupButton?.addEventListener("click", showSignup);
+    showLoginButton?.addEventListener("click", showLogin);
 
     document.addEventListener("keydown", (event) => {
         if (event.key === "Escape" && !accountModal.hidden) {
@@ -43,83 +83,101 @@ if (accountButton && accountModal) {
         }
     });
 
-    showSignupButton?.addEventListener("click", () => {
-        signupForm.hidden = false;
-        loginForm.hidden = true;
-        authMessage.textContent = "";
-
-        accountTitle.textContent = "Create your account";
-        accountDescription.textContent =
-            "Join Planora and organise your learning.";
-    });
-
-    showLoginButton?.addEventListener("click", () => {
-        signupForm.hidden = true;
-        loginForm.hidden = false;
-        authMessage.textContent = "";
-
-        accountTitle.textContent = "Welcome back!";
-        accountDescription.textContent =
-            "Log in to access your Planora account.";
-    });
-
     signupForm?.addEventListener("submit", async (event) => {
         event.preventDefault();
 
-        authMessage.textContent = "Creating your account...";
+        const nameInput = document.getElementById("signup-name");
+        const emailInput = document.getElementById("signup-email");
+        const passwordInput = document.getElementById("signup-password");
 
-        const name = document
-            .getElementById("signup-name").value.trim();
-        const email = document
-            .getElementById("signup-email").value.trim();
-        const password = document
-            .getElementById("signup-password").value;
-
-        const { data, error } = await supabaseClient.auth.signUp({
-            email,
-            password,
-            options: {
-                data: {
-                    full_name: name
-                }
-            }
-        });
-
-        if (error) {
-            authMessage.textContent = error.message;
+        if (!nameInput || !emailInput || !passwordInput) {
+            showMessage("Some sign-up fields are missing from the page.");
             return;
         }
 
-        authMessage.textContent = data.session
-            ? "Account created successfully!"
-            : "Account created! Check your email to confirm your account.";
+        const name = nameInput.value.trim();
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+
+        if (!name || !email || !password) {
+            showMessage("Please complete all sign-up fields.");
+            return;
+        }
+
+        showMessage("Creating your account...");
+
+        try {
+            const { data, error } = await supabaseClient.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        full_name: name
+                    }
+                }
+            });
+
+            if (error) {
+                showMessage(error.message);
+                return;
+            }
+
+            if (data.user && data.session) {
+                showMessage("Account created successfully!");
+                accountButton.textContent = name.charAt(0).toUpperCase();
+            } else {
+                showMessage(
+                    "Account created! Check your email to confirm your account."
+                );
+            }
+        } catch (error) {
+            showMessage("Something went wrong. Please try again.");
+            console.error(error);
+        }
     });
 
     loginForm?.addEventListener("submit", async (event) => {
         event.preventDefault();
 
-        authMessage.textContent = "Logging in...";
+        const emailInput = document.getElementById("login-email");
+        const passwordInput = document.getElementById("login-password");
 
-        const email = document
-            .getElementById("login-email").value.trim();
-        const password = document
-            .getElementById("login-password").value;
-
-        const { error } = await supabaseClient.auth.signInWithPassword({
-            email,
-            password
-        });
-
-        if (error) {
-            authMessage.textContent = error.message;
+        if (!emailInput || !passwordInput) {
+            showMessage("Some login fields are missing from the page.");
             return;
         }
 
-        const { data } = await supabaseClient.auth.getUser();
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
 
-        authMessage.textContent = "Logged in successfully!";
-        accountButton.textContent =
-            data.user?.user_metadata?.full_name?.charAt(0)?.toUpperCase()
-            || "U";
+        if (!email || !password) {
+            showMessage("Please enter your email and password.");
+            return;
+        }
+
+        showMessage("Logging in...");
+
+        try {
+            const { data, error } =
+                await supabaseClient.auth.signInWithPassword({
+                    email,
+                    password
+                });
+
+            if (error) {
+                showMessage(error.message);
+                return;
+            }
+
+            const name = data.user?.user_metadata?.full_name;
+
+            accountButton.textContent =
+                name?.charAt(0)?.toUpperCase() || "U";
+
+            showMessage("Logged in successfully!");
+        } catch (error) {
+            showMessage("Something went wrong. Please try again.");
+            console.error(error);
+        }
     });
 }
