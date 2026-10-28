@@ -1180,3 +1180,8 @@ label {
     overflow-wrap: anywhere;
     font-size: 14px;
 }
+
+#signup-form[hidden],
+#login-form[hidden] {
+    display: none !important;
+}
