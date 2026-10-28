@@ -95,8 +95,8 @@ if (accountButton && accountModal) {
             return;
         }
 
-        const name = nameInput.value.trim();
-        const email = emailInput.value.trim();
+        const name = (nameInput.value ?? "").trim();
+        const email = (emailInput.value ?? "").trim();
         const password = passwordInput.value;
 
         if (!name || !email || !password) {
@@ -147,7 +147,7 @@ if (accountButton && accountModal) {
             return;
         }
 
-        const email = emailInput.value.trim();
+        const email = (emailInput.value ?? "").trim();
         const password = passwordInput.value;
 
         if (!email || !password) {
