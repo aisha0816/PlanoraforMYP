@@ -485,3 +485,208 @@ async function deleteTask(taskId) {
     showTaskMessage("Task deleted.");
     await loadTasks();
 }
+
+const scheduleForm = document.getElementById("schedule-form");
+const scheduleList = document.getElementById("schedule-list");
+const scheduleStatus = document.getElementById("schedule-status");
+const addSessionButton = document.getElementById("add-session-button");
+
+function showScheduleMessage(message) {
+    if (scheduleStatus) {
+        scheduleStatus.textContent = message;
+    }
+}
+
+function renderSessions(sessions) {
+    if (!scheduleList) return;
+
+    scheduleList.replaceChildren();
+
+    if (sessions.length === 0) {
+        const emptyMessage = document.createElement("li");
+        emptyMessage.className = "empty-message";
+        emptyMessage.textContent = "No sessions planned yet.";
+        scheduleList.appendChild(emptyMessage);
+        return;
+    }
+
+    sessions.forEach((session) => {
+        const item = document.createElement("li");
+        item.className = "schedule-session";
+
+        const title = document.createElement("h3");
+        title.textContent = session.title;
+
+        const date = document.createElement("p");
+        const [year, month, day] = session.session_date
+            .split("-")
+            .map(Number);
+
+        date.textContent = new Date(year, month - 1, day)
+            .toLocaleDateString(undefined, {
+                weekday: "short",
+                day: "numeric",
+                month: "short",
+                year: "numeric"
+            });
+
+        const time = document.createElement("p");
+
+        function formatTime(value) {
+            const [hours, minutes] = value.split(":").map(Number);
+            const formatted = new Date();
+            formatted.setHours(hours, minutes, 0, 0);
+
+            return formatted.toLocaleTimeString([], {
+                hour: "numeric",
+                minute: "2-digit"
+            });
+        }
+
+        time.textContent =
+            `${formatTime(session.start_time)} - ${formatTime(session.end_time)}`;
+
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.textContent = "Delete";
+
+        deleteButton.addEventListener("click", () => {
+            deleteSession(session.id, deleteButton);
+        });
+
+        item.append(title, date, time, deleteButton);
+        scheduleList.appendChild(item);
+    });
+}
+
+async function loadSessions() {
+    if (!scheduleList || !supabaseClient) return;
+
+    showScheduleMessage("Loading sessions...");
+
+    const user = await getCurrentUser();
+
+    if (!user) {
+        renderSessions([]);
+        showScheduleMessage("Log in to view and save your schedule.");
+        return;
+    }
+
+    const { data, error } = await supabaseClient
+        .from("schedule_sessions")
+        .select("id, title, session_date, start_time, end_time")
+        .eq("user_id", user.id)
+        .order("session_date", { ascending: true })
+        .order("start_time", { ascending: true });
+
+    if (error) {
+        console.error("Could not load sessions:", error);
+        showScheduleMessage(`Could not load sessions: ${error.message}`);
+        return;
+    }
+
+    renderSessions(data || []);
+    showScheduleMessage("");
+}
+
+if (scheduleForm && scheduleList && supabaseClient) {
+    scheduleForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const title = document.getElementById("session-title")?.value.trim();
+        const sessionDate = document.getElementById("session-date")?.value;
+        const startTime = document.getElementById("session-start")?.value;
+        const endTime = document.getElementById("session-end")?.value;
+
+        if (!title || !sessionDate || !startTime || !endTime) {
+            showScheduleMessage("Please complete all fields.");
+            return;
+        }
+
+        if (endTime <= startTime) {
+            showScheduleMessage("The end time must be after the start time.");
+            return;
+        }
+
+        const user = await getCurrentUser();
+
+        if (!user) {
+            showScheduleMessage("Please log in before adding a session.");
+
+            if (accountModal) {
+                accountModal.hidden = false;
+                document.getElementById("show-login")?.click();
+            }
+
+            return;
+        }
+
+        if (addSessionButton) addSessionButton.disabled = true;
+
+        showScheduleMessage("Saving session...");
+
+        try {
+            const { error } = await supabaseClient
+                .from("schedule_sessions")
+                .insert({
+                    user_id: user.id,
+                    title,
+                    session_date: sessionDate,
+                    start_time: startTime,
+                    end_time: endTime
+                });
+
+            if (error) {
+                console.error("Could not save session:", error);
+                showScheduleMessage(`Could not save session: ${error.message}`);
+                return;
+            }
+
+            scheduleForm.reset();
+            showScheduleMessage("Session added successfully!");
+            await loadSessions();
+        } catch (error) {
+            console.error("Schedule connection error:", error);
+            showScheduleMessage("Connection failed. Please try again.");
+        } finally {
+            if (addSessionButton) addSessionButton.disabled = false;
+        }
+    });
+
+    loadSessions();
+}
+
+async function deleteSession(sessionId, button) {
+    const user = await getCurrentUser();
+
+    if (!user) {
+        showScheduleMessage("Please log in to delete sessions.");
+        return;
+    }
+
+    if (!window.confirm("Delete this study session?")) return;
+
+    button.disabled = true;
+
+    try {
+        const { error } = await supabaseClient
+            .from("schedule_sessions")
+            .delete()
+            .eq("id", sessionId)
+            .eq("user_id", user.id);
+
+        if (error) {
+            console.error("Could not delete session:", error);
+            showScheduleMessage(`Could not delete session: ${error.message}`);
+            return;
+        }
+
+        showScheduleMessage("Session deleted.");
+        await loadSessions();
+    } catch (error) {
+        console.error("Schedule deletion error:", error);
+        showScheduleMessage("Connection failed. Please try again.");
+    } finally {
+        button.disabled = false;
+    }
+}
