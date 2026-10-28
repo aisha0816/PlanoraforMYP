@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Planora - Schedule</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js" defer></script>
 </head>
 <body>
@@ -55,5 +56,92 @@
             </ul>
         </section>
     </main>
+
+    <div id="account-modal" class="modal" hidden>
+        <div class="modal-backdrop" id="modal-backdrop"></div>
+
+        <section
+            class="modal-content card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="account-title"
+            aria-describedby="account-description">
+
+            <button
+                id="close-account"
+                type="button"
+                class="modal-close"
+                aria-label="Close account panel">
+                &times;
+            </button>
+
+            <h2 id="account-title">Create your account</h2>
+
+            <p id="account-description">
+                Enter your details to get started with Planora.
+            </p>
+
+            <div class="auth-tabs">
+                <button id="show-signup" type="button">Sign up</button>
+                <button id="show-login" type="button">Log in</button>
+            </div>
+
+            <form id="signup-form">
+                <label for="signup-name">Your name</label>
+                <input
+                    id="signup-name"
+                    name="name"
+                    type="text"
+                    autocomplete="name"
+                    placeholder="Enter your name"
+                    required>
+
+                <label for="signup-email">Email</label>
+                <input
+                    id="signup-email"
+                    name="email"
+                    type="email"
+                    autocomplete="email"
+                    placeholder="Enter your email"
+                    required>
+
+                <label for="signup-password">Password</label>
+                <input
+                    id="signup-password"
+                    name="password"
+                    type="password"
+                    autocomplete="new-password"
+                    minlength="6"
+                    placeholder="Create a password"
+                    required>
+
+                <button type="submit">Create account</button>
+            </form>
+
+            <form id="login-form" hidden>
+                <label for="login-email">Email</label>
+                <input
+                    id="login-email"
+                    name="email"
+                    type="email"
+                    autocomplete="email"
+                    placeholder="Enter your email"
+                    required>
+
+                <label for="login-password">Password</label>
+                <input
+                    id="login-password"
+                    name="password"
+                    type="password"
+                    autocomplete="current-password"
+                    placeholder="Enter your password"
+                    required>
+
+                <button type="submit">Log in</button>
+            </form>
+
+            <p id="auth-message" role="status" aria-live="polite"></p>
+        </section>
+    </div>
 </body>
 </html>
