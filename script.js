@@ -970,22 +970,21 @@ if (
     });
 }
 
-
 const progressTotal = document.getElementById("progress-total");
 const progressCompleted = document.getElementById("progress-completed");
 const progressRate = document.getElementById("progress-rate");
 const progressFocus = document.getElementById("progress-focus");
-const progressTodayTasks = document.getElementById("progress-today-tasks");
-const progressTodayFocus = document.getElementById("progress-today-focus");
 const progressStatus = document.getElementById("progress-status");
 const goalDescription = document.getElementById("goal-description");
 const goalProgress = document.getElementById("goal-progress");
 const goalCount = document.getElementById("goal-count");
+const progressTodayTasks = document.getElementById("progress-today-tasks");
+const progressTodayFocus = document.getElementById("progress-today-focus");
 const weeklyReflection = document.getElementById("weekly-reflection");
 const saveReflectionButton = document.getElementById("save-reflection");
 const reflectionStatus = document.getElementById("reflection-status");
 
-function getLocalDateString(date = new Date()) {
+function progressLocalDateString(date = new Date()) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
@@ -993,7 +992,7 @@ function getLocalDateString(date = new Date()) {
     return `${year}-${month}-${day}`;
 }
 
-function getLocalDayRange() {
+function progressLocalDayRange() {
     const start = new Date();
     start.setHours(0, 0, 0, 0);
 
@@ -1006,13 +1005,44 @@ function getLocalDayRange() {
     };
 }
 
-function getWeekStart() {
-    const today = new Date();
-    const daysSinceMonday = (today.getDay() + 6) % 7;
+function progressWeekStart() {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
 
-    today.setDate(today.getDate() - daysSinceMonday);
+    const daysSinceMonday = (date.getDay() + 6) % 7;
+    date.setDate(date.getDate() - daysSinceMonday);
 
-    return getLocalDateString(today);
+    return progressLocalDateString(date);
+}
+
+async function loadWeeklyReflection(userId) {
+    if (!weeklyReflection) return;
+
+    const weekStart = progressWeekStart();
+
+    const { data, error } = await supabaseClient
+        .from("weekly_reflections")
+        .select("reflection")
+        .eq("user_id", userId)
+        .eq("week_start", weekStart)
+        .maybeSingle();
+
+    if (error) {
+        console.error("Could not load weekly reflection:", error);
+
+        if (reflectionStatus) {
+            reflectionStatus.textContent =
+                "Could not load your reflection. Please try again.";
+        }
+
+        return;
+    }
+
+    weeklyReflection.value = data?.reflection ?? "";
+
+    if (reflectionStatus) {
+        reflectionStatus.textContent = "";
+    }
 }
 
 async function loadProgress() {
@@ -1028,191 +1058,159 @@ async function loadProgress() {
         progressTotal.textContent = "0";
         progressCompleted.textContent = "0";
         progressRate.textContent = "0%";
+        progressFocus.textContent = "0";
+        progressTodayTasks.textContent = "0";
+        progressTodayFocus.textContent = "0";
 
-        if (progressFocus) progressFocus.textContent = "0";
-        if (progressTodayTasks) progressTodayTasks.textContent = "0";
-        if (progressTodayFocus) progressTodayFocus.textContent = "0";
+        goalDescription.textContent =
+            "Log in and add tasks with due dates to track your daily goal.";
 
-        if (goalProgress) {
-            goalProgress.max = 1;
-            goalProgress.value = 0;
-        }
+        goalProgress.max = 1;
+        goalProgress.value = 0;
+        goalCount.textContent = "0 tasks completed today";
 
-        if (goalCount) {
-            goalCount.textContent = "Log in to track your daily goal.";
-        }
-
-        if (goalDescription) {
-            goalDescription.textContent =
-                "Log in to track your personal progress.";
+        if (weeklyReflection) {
+            weeklyReflection.value = "";
         }
 
         if (progressStatus) {
             progressStatus.textContent =
-                "Log in to view your saved progress.";
+                "Log in to see your personal progress.";
         }
-
-        if (weeklyReflection) weeklyReflection.value = "";
 
         if (reflectionStatus) {
             reflectionStatus.textContent =
-                "Log in to view and save your weekly reflection.";
+                "Log in to load and save your weekly reflection.";
         }
 
         return;
     }
 
-    const today = getLocalDateString();
-    const { start, end } = getLocalDayRange();
+    const { data: tasks, error: tasksError } = await supabaseClient
+        .from("tasks")
+        .select("id, completed, completed_at, due_date")
+        .eq("user_id", user.id);
 
-    const [tasksResult, focusResult, todayFocusResult] =
-        await Promise.all([
-            supabaseClient
-                .from("tasks")
-                .select("id, completed, completed_at, due_date")
-                .eq("user_id", user.id),
-
-            supabaseClient
-                .from("pomodoro_sessions")
-                .select("id", { count: "exact", head: true })
-                .eq("user_id", user.id),
-
-            supabaseClient
-                .from("pomodoro_sessions")
-                .select("id", { count: "exact", head: true })
-                .eq("user_id", user.id)
-                .gte("completed_at", start)
-                .lt("completed_at", end)
-        ]);
-
-    if (tasksResult.error || focusResult.error || todayFocusResult.error) {
-        const error =
-            tasksResult.error ||
-            focusResult.error ||
-            todayFocusResult.error;
-
-        console.error("Could not load progress:", error);
+    if (tasksError) {
+        console.error("Could not load progress tasks:", tasksError);
 
         if (progressStatus) {
             progressStatus.textContent =
-                `Could not load progress: ${error.message}`;
+                "Could not load your progress. Please try again.";
         }
 
         return;
     }
 
-    const tasks = tasksResult.data || [];
-    const total = tasks.length;
-    const completed = tasks.filter(task => task.completed).length;
+    const { data: focusSessions, error: focusError } = await supabaseClient
+        .from("pomodoro_sessions")
+        .select("completed_at")
+        .eq("user_id", user.id);
+
+    if (focusError) {
+        console.error("Could not load focus sessions:", focusError);
+
+        if (progressStatus) {
+            progressStatus.textContent =
+                "Could not load your focus sessions. Please try again.";
+        }
+
+        return;
+    }
+
+    const today = progressLocalDateString();
+    const { start, end } = progressLocalDayRange();
+
+    const totalTasks = tasks.length;
+
+    const completedTasks = tasks.filter(
+        task => task.completed
+    ).length;
+
+    const completionRate = totalTasks === 0
+        ? 0
+        : Math.round((completedTasks / totalTasks) * 100);
 
     const completedToday = tasks.filter(task => {
-        if (!task.completed || !task.completed_at) return false;
+        if (!task.completed || !task.completed_at) {
+            return false;
+        }
 
-        return getLocalDateString(new Date(task.completed_at)) === today;
+        return progressLocalDateString(
+            new Date(task.completed_at)
+        ) === today;
     }).length;
 
-    const tasksDueToday = tasks.filter(task => task.due_date === today);
+    const focusSessionsToday = focusSessions.filter(session => {
+        const completedAt = new Date(session.completed_at).getTime();
+
+        return completedAt >= new Date(start).getTime()
+            && completedAt < new Date(end).getTime();
+    }).length;
+
+    const tasksDueToday = tasks.filter(
+        task => task.due_date === today
+    );
+
     const completedDueToday = tasksDueToday.filter(
         task => task.completed
     ).length;
 
     const dailyGoal = tasksDueToday.length;
-    const rate = total === 0
-        ? 0
-        : Math.round((completed / total) * 100);
 
-    const totalFocus = focusResult.count ?? 0;
-    const todayFocus = todayFocusResult.count ?? 0;
+    progressTotal.textContent = totalTasks;
+    progressCompleted.textContent = completedTasks;
+    progressRate.textContent = `${completionRate}%`;
+    progressFocus.textContent = focusSessions.length;
+    progressTodayTasks.textContent = completedToday;
+    progressTodayFocus.textContent = focusSessionsToday;
 
-    progressTotal.textContent = total;
-    progressCompleted.textContent = completed;
-    progressRate.textContent = `${rate}%`;
+    if (dailyGoal === 0) {
+        goalDescription.textContent =
+            "No tasks are due today. Add a due date to a task to create your daily goal.";
 
-    if (progressFocus) progressFocus.textContent = totalFocus;
-    if (progressTodayTasks) {
-        progressTodayTasks.textContent = completedToday;
-    }
-
-    if (progressTodayFocus) {
-        progressTodayFocus.textContent = todayFocus;
-    }
-
-    if (goalProgress) {
-        goalProgress.max = dailyGoal || 1;
+        goalProgress.max = 1;
+        goalProgress.value = 0;
+        goalCount.textContent = "0 tasks completed toward today's goal";
+    } else {
+        goalProgress.max = dailyGoal;
         goalProgress.value = completedDueToday;
-    }
 
-    if (goalCount) {
-        goalCount.textContent = dailyGoal === 0
-            ? "No tasks are due today."
-            : `${completedDueToday} of ${dailyGoal} tasks due today completed`;
-    }
+        goalDescription.textContent =
+            completedDueToday === dailyGoal
+                ? "You have completed every task due today. Great work!"
+                : "Complete your tasks due today to reach your daily goal.";
 
-    if (goalDescription) {
-        if (dailyGoal === 0) {
-            goalDescription.textContent =
-                "No tasks are due today. Enjoy the breathing room or get ahead on future work!";
-        } else if (completedDueToday === dailyGoal) {
-            goalDescription.textContent =
-                "Daily goal achieved! All tasks due today are complete.";
-        } else {
-            const remaining = dailyGoal - completedDueToday;
-
-            goalDescription.textContent =
-                `${remaining} task${remaining === 1 ? "" : "s"} due today still to complete.`;
-        }
+        goalCount.textContent =
+            `${completedDueToday} of ${dailyGoal} tasks completed`;
     }
 
     if (progressStatus) {
-        progressStatus.textContent = "Your progress is up to date.";
+        progressStatus.textContent =
+            "Your progress has been updated.";
     }
 
     await loadWeeklyReflection(user.id);
 }
 
-async function loadWeeklyReflection(userId) {
-    if (!weeklyReflection || !supabaseClient) return;
-
-    const { data, error } = await supabaseClient
-        .from("weekly_reflections")
-        .select("reflection")
-        .eq("user_id", userId)
-        .eq("week_start", getWeekStart())
-        .maybeSingle();
-
-    if (error) {
-        console.error("Could not load weekly reflection:", error);
-
-        if (reflectionStatus) {
-            reflectionStatus.textContent =
-                `Could not load reflection: ${error.message}`;
-        }
-
-        return;
-    }
-
-    weeklyReflection.value = data?.reflection || "";
-
-    if (reflectionStatus) {
-        reflectionStatus.textContent = data
-            ? "Your saved reflection is ready to edit."
-            : "Write a reflection about this week.";
-    }
-}
-
-if (saveReflectionButton && weeklyReflection && supabaseClient) {
+if (saveReflectionButton) {
     saveReflectionButton.addEventListener("click", async () => {
         const user = await getCurrentUser();
 
         if (!user) {
-            if (reflectionStatus) {
-                reflectionStatus.textContent =
-                    "Please log in to save your reflection.";
+            if (typeof promptLogin === "function") {
+                promptLogin();
             }
 
-            if (accountModal) {
-                accountModal.hidden = false;
-                document.getElementById("show-login")?.click();
+            const showLoginButton = document.getElementById("show-login");
+
+            if (showLoginButton) {
+                showLoginButton.click();
+            }
+
+            if (reflectionStatus) {
+                reflectionStatus.textContent =
+                    "Log in to save your weekly reflection.";
             }
 
             return;
@@ -1221,63 +1219,47 @@ if (saveReflectionButton && weeklyReflection && supabaseClient) {
         const reflection = weeklyReflection.value.trim();
 
         if (!reflection) {
-            if (reflectionStatus) {
-                reflectionStatus.textContent =
-                    "Write a reflection before saving.";
-            }
+            reflectionStatus.textContent =
+                "Write a reflection before saving.";
+            weeklyReflection.focus();
+            return;
+        }
+
+        const weekStart = progressWeekStart();
+
+        saveReflectionButton.disabled = true;
+        reflectionStatus.textContent = "Saving your reflection...";
+
+        const { error } = await supabaseClient
+            .from("weekly_reflections")
+            .upsert(
+                {
+                    user_id: user.id,
+                    week_start: weekStart,
+                    reflection: reflection,
+                    updated_at: new Date().toISOString()
+                },
+                {
+                    onConflict: "user_id,week_start"
+                }
+            );
+
+        saveReflectionButton.disabled = false;
+
+        if (error) {
+            console.error("Could not save weekly reflection:", error);
+
+            reflectionStatus.textContent =
+                "Could not save your reflection. Please try again.";
 
             return;
         }
 
-        saveReflectionButton.disabled = true;
-
-        if (reflectionStatus) {
-            reflectionStatus.textContent = "Saving your reflection...";
-        }
-
-        try {
-            const { error } = await supabaseClient
-                .from("weekly_reflections")
-                .upsert(
-                    {
-                        user_id: user.id,
-                        week_start: getWeekStart(),
-                        reflection,
-                        updated_at: new Date().toISOString()
-                    },
-                    {
-                        onConflict: "user_id,week_start"
-                    }
-                );
-
-            if (error) {
-                console.error("Could not save reflection:", error);
-
-                if (reflectionStatus) {
-                    reflectionStatus.textContent =
-                        `Could not save reflection: ${error.message}`;
-                }
-
-                return;
-            }
-
-            if (reflectionStatus) {
-                reflectionStatus.textContent =
-                    "Reflection saved successfully!";
-            }
-        } catch (error) {
-            console.error("Reflection connection error:", error);
-
-            if (reflectionStatus) {
-                reflectionStatus.textContent =
-                    "Connection failed. Please try again.";
-            }
-        } finally {
-            saveReflectionButton.disabled = false;
-        }
+        reflectionStatus.textContent =
+            "Your weekly reflection has been saved!";
     });
 }
 
-if (progressTotal && supabaseClient) {
+if (progressTotal) {
     loadProgress();
 }
