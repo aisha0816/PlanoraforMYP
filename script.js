@@ -1,17 +1,33 @@
+
 const SUPABASE_URL = "https://oxyiaqomqvzmgrsagroc.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_4A95N9DBr72t7DStUrOrHw__Jn9f_gz";
 
-const supabaseClient = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY
-);
-
-console.log("Supabase client initialised!");
+let supabaseClient = null;
 
 const accountButton = document.getElementById("account-button");
 const accountModal = document.getElementById("account-modal");
 
-if (accountButton && accountModal) {
+function showMessage(message) {
+    const authMessage = document.getElementById("auth-message");
+
+    if (authMessage) {
+        authMessage.textContent = message;
+    }
+}
+
+if (typeof supabase === "undefined") {
+    showMessage("Supabase failed to load. Check your internet connection and refresh the page.");
+    console.error("Supabase library is unavailable.");
+} else {
+    supabaseClient = supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+    );
+
+    console.log("Supabase client initialised!");
+}
+
+if (accountButton && accountModal && supabaseClient) {
     const closeButton = document.getElementById("close-account");
     const backdrop = document.getElementById("modal-backdrop");
     const signupForm = document.getElementById("signup-form");
@@ -20,13 +36,6 @@ if (accountButton && accountModal) {
     const showLoginButton = document.getElementById("show-login");
     const accountTitle = document.getElementById("account-title");
     const accountDescription = document.getElementById("account-description");
-    const authMessage = document.getElementById("auth-message");
-
-    function showMessage(message) {
-        if (authMessage) {
-            authMessage.textContent = message;
-        }
-    }
 
     function closeAccountModal() {
         accountModal.hidden = true;
@@ -91,12 +100,12 @@ if (accountButton && accountModal) {
         const passwordInput = document.getElementById("signup-password");
 
         if (!nameInput || !emailInput || !passwordInput) {
-            showMessage("Some sign-up fields are missing from the page.");
+            showMessage("Some sign-up fields are missing.");
             return;
         }
 
-        const name = (nameInput.value ?? "").trim();
-        const email = (emailInput.value ?? "").trim();
+        const name = nameInput.value.trim();
+        const email = emailInput.value.trim();
         const password = passwordInput.value;
 
         if (!name || !email || !password) {
@@ -119,20 +128,23 @@ if (accountButton && accountModal) {
 
             if (error) {
                 showMessage(error.message);
+                console.error("Signup error:", error);
                 return;
             }
 
-            if (data.user && data.session) {
-                showMessage("Account created successfully!");
+            if (data.session) {
                 accountButton.textContent = name.charAt(0).toUpperCase();
+                showMessage("Account created successfully!");
             } else {
                 showMessage(
-                    "Account created! Check your email to confirm your account."
+                    "Sign-up request accepted. Check your email to confirm your account."
                 );
             }
         } catch (error) {
-            showMessage("Something went wrong. Please try again.");
-            console.error(error);
+            console.error("Signup connection error:", error);
+            showMessage(
+                error.message || "Could not connect to Supabase. Please try again."
+            );
         }
     });
 
@@ -143,11 +155,11 @@ if (accountButton && accountModal) {
         const passwordInput = document.getElementById("login-password");
 
         if (!emailInput || !passwordInput) {
-            showMessage("Some login fields are missing from the page.");
+            showMessage("Some login fields are missing.");
             return;
         }
 
-        const email = (emailInput.value ?? "").trim();
+        const email = emailInput.value.trim();
         const password = passwordInput.value;
 
         if (!email || !password) {
@@ -166,6 +178,7 @@ if (accountButton && accountModal) {
 
             if (error) {
                 showMessage(error.message);
+                console.error("Login error:", error);
                 return;
             }
 
@@ -176,8 +189,10 @@ if (accountButton && accountModal) {
 
             showMessage("Logged in successfully!");
         } catch (error) {
-            showMessage("Something went wrong. Please try again.");
-            console.error(error);
+            console.error("Login connection error:", error);
+            showMessage(
+                error.message || "Could not connect to Supabase. Please try again."
+            );
         }
     });
 }
