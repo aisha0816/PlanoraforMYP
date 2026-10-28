@@ -14,15 +14,22 @@
 
         <nav class="nav-links" aria-label="Main navigation">
             <a href="index.html">Dashboard</a>
-            <a class="active" href="tasks.html" aria-curent="page">Tasks</a>
+            <a class="active" href="tasks.html" aria-current="page">Tasks</a>
             <a href="schedule.html">Schedule</a>
             <a href="pomodoro.html">Pomodoro</a>
             <a href="progress.html">Progress</a>
             <a href="settings.html">Settings</a>
         </nav>
 
-        <button class="profile" id="account-button"
-            type="button" aria-label="Sign up or log in">U</button>
+        <button
+            class="profile"
+            id="account-button"
+            type="button"
+            aria-label="Sign up or log in"
+            aria-haspopup="dialog"
+            aria-controls="account-modal">
+            U
+        </button>
     </header>
 
     <main class="container">
@@ -39,22 +46,32 @@
 
             <form id="task-form" class="task-form" hidden>
                 <label for="task-input">Task name</label>
-                <input id="task-input" type="text"
-                    placeholder="e.g. Revise LL" required>
+                <input
+                    id="task-input"
+                    name="title"
+                    type="text"
+                    placeholder="e.g. Revise LL"
+                    required>
 
                 <label for="task-subject">Subject</label>
-                <input id="task-subject" type="text"
-                    placeholder="e.g. Int. Sciences">
+                <input
+                    id="task-subject"
+                    name="subject"
+                    type="text"
+                    placeholder="e.g. Integrated Sciences">
 
                 <label for="task-priority">Priority</label>
-                <select id="task-priority">
+                <select id="task-priority" name="priority">
                     <option value="Low">Low</option>
                     <option value="Medium" selected>Medium</option>
                     <option value="High">High</option>
                 </select>
 
                 <label for="task-due-date">Due date</label>
-                <input id="task-due-date" type="date">
+                <input
+                    id="task-due-date"
+                    name="due_date"
+                    type="date">
 
                 <button type="submit">Save task</button>
             </form>
@@ -68,58 +85,90 @@
     </main>
 
     <div id="account-modal" class="modal" hidden>
-        <div class="modal=backdrop" id="modal-backdrop"></div>
-    
-    <section class="modal-content card"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="account-title">
+        <div class="modal-backdrop" id="modal-backdrop"></div>
 
-        <button id="close-account" type="button"
-            class="modal-close" aria-label="Close account panel">
-            &times;
-        </button>
+        <section
+            class="modal-content card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="account-title"
+            aria-describedby="account-description">
 
-        <h2 id="account-title">Create your account</h2>
-        <p id="account-description">
-            Enter your details to get started with Planora.
-        </p>
+            <button
+                id="close-account"
+                type="button"
+                class="modal-close"
+                aria-label="Close account panel">
+                &times;
+            </button>
 
-        <div class="auth-tabs">
-            <button id="show-signup" type="button">Sign up</button>
-            <button id="show-login" type="button">Log in</button>
-        </div>
+            <h2 id="account-title">Create your account</h2>
 
-        <form id="signup-form">
-            <label for="signup-name">Your name</label>
-            <label id="signup-name" type="text"
-                autocomplete="name" required>
+            <p id="account-description">
+                Enter your details to get started with Planora.
+            </p>
 
-            <label for="signup-email">Email</label>
-            <input id="signup-email" type="email"
-                autocomplete="name" required>
+            <div class="auth-tabs">
+                <button id="show-signup" type="button">Sign up</button>
+                <button id="show-login" type="button">Log in</button>
+            </div>
 
-            <label for="signup-password">Password</label>
-            <input id="signup-password" type="password"
-                autocomplete="new-password" minlength="6" required>
+            <form id="signup-form">
+                <label for="signup-name">Your name</label>
+                <input
+                    id="signup-name"
+                    name="name"
+                    type="text"
+                    autocomplete="name"
+                    placeholder="Enter your name"
+                    required>
 
-            <button type="submit">Create account</button>
-        </form>
+                <label for="signup-email">Email</label>
+                <input
+                    id="signup-email"
+                    name="email"
+                    type="email"
+                    autocomplete="email"
+                    placeholder="Enter your email"
+                    required>
 
-        <form id="login-form" hidden>
-            <label for="login-email">Email</label>
-            <input id="login-email" type="email"
-                autocomplete="email" required>
-            
-            <label for="login-password">Password</label>
-            <label id="login-password" type="password"
-                autocomplete="current-password" required>
-            
-            <button type="submit">Log in</button>
-        </form>
+                <label for="signup-password">Password</label>
+                <input
+                    id="signup-password"
+                    name="password"
+                    type="password"
+                    autocomplete="new-password"
+                    minlength="6"
+                    placeholder="Create a password"
+                    required>
 
-        <p id="auth-message" rel="status"></p>
-    </section>
+                <button type="submit">Create account</button>
+            </form>
+
+            <form id="login-form" hidden>
+                <label for="login-email">Email</label>
+                <input
+                    id="login-email"
+                    name="email"
+                    type="email"
+                    autocomplete="email"
+                    placeholder="Enter your email"
+                    required>
+
+                <label for="login-password">Password</label>
+                <input
+                    id="login-password"
+                    name="password"
+                    type="password"
+                    autocomplete="current-password"
+                    placeholder="Enter your password"
+                    required>
+
+                <button type="submit">Log in</button>
+            </form>
+
+            <p id="auth-message" role="status" aria-live="polite"></p>
+        </section>
     </div>
 </body>
 </html>
