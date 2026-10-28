@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +12,7 @@
 <body>
     <header class="navbar">
         <a class="logo" href="index.html">Planora</a>
-        <nav class="nav-links" aria0label="Main navigation">
+        <nav class="nav-links" aria-label="Main navigation">
             <a href="index.html">Dashboard</a>
             <a href="tasks.html">Tasks</a>
             <a href="schedule.html">Schedule</a>
@@ -20,7 +21,7 @@
             <a href="settings.html">Settings</a>
         </nav>
         <button class="profile" id="account-button" type="button"
-        aria-label="Sign up or log in">U</button>
+            aria-label="Sign up or log in">U</button>
     </header>
 
     <main class="container">
@@ -28,6 +29,10 @@
             <h1>My Progress</h1>
             <p>See how consistently you complete your work and meet your goals.</p>
         </section>
+
+        <p id="progress-status" role="status" aria-live="polite">
+            Loading your progress...
+        </p>
 
         <section class="summary">
             <article class="card">
@@ -39,48 +44,54 @@
                 <h2 id="progress-completed">0</h2>
             </article>
             <article class="card">
-                <p>Complete rate</p>
+                <p>Completion rate</p>
                 <h2 id="progress-rate">0%</h2>
+            </article>
+            <article class="card">
+                <p>Focus sessions</p>
+                <h2 id="progress-focus">0</h2>
             </article>
         </section>
 
         <section class="card">
             <h2>Daily goal</h2>
-            <p id="goal-description">Complete your first task to begin tracking progress.</p>
+            <p id="goal-description">
+                Complete your first task to begin tracking progress.
+            </p>
             <progress id="goal-progress" value="0" max="5"></progress>
-            <p id="goal-count">0 of 5 tasks completed</p>
+            <p id="goal-count">0 of 5 tasks completed today</p>
+        </section>
+
+        <section class="card">
+            <h2>Today's activity</h2>
+            <p>Tasks completed today: <strong id="progress-today-tasks">0</strong></p>
+            <p>Focus sessions today: <strong id="progress-today-focus">0</strong></p>
         </section>
 
         <section class="card deadlines">
             <h2>Weekly reflection</h2>
             <p>What went well this week?</p>
             <textarea id="weekly-reflection"
-                placeholder="Write as short reflection..."
+                placeholder="Write a short reflection..."
                 rows="4" style="width: 100%;"></textarea>
             <button id="save-reflection" type="button">Save reflection</button>
+            <p id="reflection-status" role="status" aria-live="polite"></p>
         </section>
     </main>
 
     <div id="account-modal" class="modal" hidden>
         <div class="modal-backdrop" id="modal-backdrop"></div>
 
-        <section
-            class="modal-content card"
+        <section class="modal-content card"
             role="dialog"
             aria-modal="true"
             aria-labelledby="account-title"
             aria-describedby="account-description">
 
-            <button
-                id="close-account"
-                type="button"
-                class="modal-close"
-                aria-label="Close account panel">
-                &times;
-            </button>
+            <button id="close-account" type="button" class="modal-close"
+                aria-label="Close account panel">&times;</button>
 
             <h2 id="account-title">Create your account</h2>
-
             <p id="account-description">
                 Enter your details to get started with Planora.
             </p>
@@ -92,54 +103,30 @@
 
             <form id="signup-form">
                 <label for="signup-name">Your name</label>
-                <input
-                    id="signup-name"
-                    name="name"
-                    type="text"
-                    autocomplete="name"
-                    placeholder="Enter your name"
-                    required>
+                <input id="signup-name" name="name" type="text"
+                    autocomplete="name" placeholder="Enter your name" required>
 
                 <label for="signup-email">Email</label>
-                <input
-                    id="signup-email"
-                    name="email"
-                    type="email"
-                    autocomplete="email"
-                    placeholder="Enter your email"
-                    required>
+                <input id="signup-email" name="email" type="email"
+                    autocomplete="email" placeholder="Enter your email" required>
 
                 <label for="signup-password">Password</label>
-                <input
-                    id="signup-password"
-                    name="password"
-                    type="password"
-                    autocomplete="new-password"
-                    minlength="6"
-                    placeholder="Create a password"
-                    required>
+                <input id="signup-password" name="password" type="password"
+                    autocomplete="new-password" minlength="6"
+                    placeholder="Create a password" required>
 
                 <button type="submit">Create account</button>
             </form>
 
             <form id="login-form" hidden>
                 <label for="login-email">Email</label>
-                <input
-                    id="login-email"
-                    name="email"
-                    type="email"
-                    autocomplete="email"
-                    placeholder="Enter your email"
-                    required>
+                <input id="login-email" name="email" type="email"
+                    autocomplete="email" placeholder="Enter your email" required>
 
                 <label for="login-password">Password</label>
-                <input
-                    id="login-password"
-                    name="password"
-                    type="password"
+                <input id="login-password" name="password" type="password"
                     autocomplete="current-password"
-                    placeholder="Enter your password"
-                    required>
+                    placeholder="Enter your password" required>
 
                 <button type="submit">Log in</button>
             </form>
