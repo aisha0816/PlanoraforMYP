@@ -690,3 +690,218 @@ async function deleteSession(sessionId, button) {
         button.disabled = false;
     }
 }
+
+const timerDisplay = document.getElementById("timer-display");
+const timerMode = document.getElementById("timer-mode");
+const timerStartButton = document.getElementById("timer-start");
+const timerResetButton = document.getElementById("timer-reset");
+const timerBreakButton = document.getElementById("timer-break");
+const timerMessage = document.getElementById("timer-message");
+
+let timerInterval = null;
+let timerPhase = "focus";
+let timerDuration = 25 * 60;
+let timerRemaining = timerDuration;
+let timerEndTime = null;
+let timerRunning = false;
+let completedFocusSessions = Number(
+    localStorage.getItem("planora-completed-sessions") || 0
+);
+
+function formatTimerTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+
+    return `${String(minutes).padStart(2, "0")}:${String(
+        remainingSeconds
+    ).padStart(2, "0")}`;
+}
+
+function updateTimerDisplay() {
+    if (!timerDisplay) return;
+
+    timerDisplay.textContent = formatTimerTime(timerRemaining);
+}
+
+function updateTimerMode() {
+    if (!timerMode) return;
+
+    if (timerPhase === "focus") {
+        timerMode.textContent = "Focus session";
+        timerDuration = 25 * 60;
+    } else if (timerPhase === "short-break") {
+        timerMode.textContent = "Short break";
+        timerDuration = 5 * 60;
+    } else {
+        timerMode.textContent = "Long break";
+        timerDuration = 15 * 60;
+    }
+}
+
+function stopTimerInterval() {
+    if (timerInterval !== null) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+}
+
+function updateTimerButtons() {
+    if (timerStartButton) {
+        timerStartButton.textContent = timerRunning ? "Pause" : "Start";
+    }
+
+    if (timerBreakButton) {
+        timerBreakButton.textContent =
+            timerPhase === "focus" ? "Take a break" : "Back to focus";
+    }
+}
+
+function switchTimerPhase(phase, message) {
+    stopTimerInterval();
+
+    timerPhase = phase;
+    timerRunning = false;
+    timerEndTime = null;
+
+    updateTimerMode();
+    timerRemaining = timerDuration;
+
+    updateTimerDisplay();
+    updateTimerButtons();
+
+    if (timerMessage) {
+        timerMessage.textContent = message;
+    }
+}
+
+function finishTimerPhase() {
+    stopTimerInterval();
+    timerRunning = false;
+    timerEndTime = null;
+
+    if (timerPhase === "focus") {
+        completedFocusSessions += 1;
+
+        localStorage.setItem(
+            "planora-completed-sessions",
+            String(completedFocusSessions)
+        );
+
+        if (completedFocusSessions % 4 === 0) {
+            switchTimerPhase(
+                "long-break",
+                "Focus session complete! Time for a 15-minute break."
+            );
+        } else {
+            switchTimerPhase(
+                "short-break",
+                "Focus session complete! Time for a 5-minute break."
+            );
+        }
+    } else {
+        switchTimerPhase(
+            "focus",
+            "Break finished! Ready for another focus session?"
+        );
+    }
+}
+
+function tickTimer() {
+    if (!timerRunning || timerEndTime === null) return;
+
+    timerRemaining = Math.max(
+        0,
+        Math.ceil((timerEndTime - Date.now()) / 1000)
+    );
+
+    updateTimerDisplay();
+
+    if (timerRemaining <= 0) {
+        finishTimerPhase();
+        return;
+    }
+}
+
+function startTimer() {
+    if (timerRunning) {
+        timerRemaining = Math.max(
+            0,
+            Math.ceil((timerEndTime - Date.now()) / 1000)
+        );
+
+        timerRunning = false;
+        timerEndTime = null;
+        stopTimerInterval();
+
+        if (timerMessage) {
+            timerMessage.textContent = "Timer paused. Resume when ready.";
+        }
+
+        updateTimerDisplay();
+        updateTimerButtons();
+        return;
+    }
+
+    if (timerRemaining <= 0) {
+        timerRemaining = timerDuration;
+    }
+
+    timerRunning = true;
+    timerEndTime = Date.now() + timerRemaining * 1000;
+
+    if (timerMessage) {
+        timerMessage.textContent =
+            timerPhase === "focus"
+                ? "Focus time. You've got this!"
+                : "Enjoy your break!";
+    }
+
+    updateTimerButtons();
+    stopTimerInterval();
+    tickTimer();
+    timerInterval = setInterval(tickTimer, 250);
+}
+
+function resetTimer() {
+    stopTimerInterval();
+
+    timerRunning = false;
+    timerEndTime = null;
+    timerRemaining = timerDuration;
+
+    updateTimerDisplay();
+    updateTimerButtons();
+
+    if (timerMessage) {
+        timerMessage.textContent = "Timer reset. Ready when you are!";
+    }
+}
+
+if (
+    timerDisplay &&
+    timerMode &&
+    timerStartButton &&
+    timerResetButton &&
+    timerBreakButton
+) {
+    updateTimerMode();
+    updateTimerDisplay();
+    updateTimerButtons();
+
+    timerStartButton.addEventListener("click", startTimer);
+    timerResetButton.addEventListener("click", resetTimer);
+
+    timerBreakButton.addEventListener("click", () => {
+        if (timerPhase === "focus") {
+            switchTimerPhase(
+                "short-break",
+                "Take a breather. Your break has started!"
+            );
+        } else {
+            switchTimerPhase(
+                "focus",
+                "Back to focus whenever you're ready!"
+            );
+        }
+    });
+}
