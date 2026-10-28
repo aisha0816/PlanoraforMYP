@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,18 +8,21 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js" defer></script>
+    <script src="schedule.js" defer></script>
 </head>
 <body>
     <header class="navbar">
         <a class="logo" href="index.html">Planora</a>
+
         <nav class="nav-links" aria-label="Main navigation">
             <a href="index.html">Dashboard</a>
             <a href="tasks.html">Tasks</a>
-            <a class="active" href="schedule.html" aria.current="page">Schedule</a>
+            <a class="active" href="schedule.html" aria-current="page">Schedule</a>
             <a href="pomodoro.html">Pomodoro</a>
             <a href="progress.html">Progress</a>
             <a href="settings.html">Settings</a>
         </nav>
+
         <button class="profile" id="account-button" type="button"
             aria-label="Sign up or log in">U</button>
     </header>
@@ -31,28 +35,30 @@
 
         <section class="card">
             <h2>Plan a study session</h2>
+
             <form id="schedule-form" class="task-form">
                 <label for="session-title">Activity</label>
-                <input id="session title" type="text"
-                    placeholder="e.g. Maths revision" required>
+                <input id="session-title" name="title" type="text"
+                    placeholder="e.g. Maths revision" maxlength="150" required>
 
                 <label for="session-date">Date</label>
-                <input id="session-date" type="date" required>
+                <input id="session-date" name="session_date" type="date" required>
 
                 <label for="session-start">Start time</label>
-                <input id="session-start" type="time" required>
+                <input id="session-start" name="start_time" type="time" required>
 
                 <label for="session-end">End time</label>
-                <input id="session-end" type="time" required>
+                <input id="session-end" name="end_time" type="time" required>
 
-                <button type="submit">Add session</button>
+                <button id="add-session-button" type="submit">Add session</button>
+                <p id="schedule-status" role="status" aria-live="polite"></p>
             </form>
         </section>
 
         <section class="card deadlines">
             <h2>Upcoming sessions</h2>
             <ul id="schedule-list">
-                <li class="empty-message">No sessions planned yet.</li>
+                <li class="empty-message">Loading sessions...</li>
             </ul>
         </section>
     </main>
@@ -60,18 +66,14 @@
     <div id="account-modal" class="modal" hidden>
         <div class="modal-backdrop" id="modal-backdrop"></div>
 
-        <section
-            class="modal-content card"
+        <section class="modal-content card"
             role="dialog"
             aria-modal="true"
             aria-labelledby="account-title"
             aria-describedby="account-description">
 
-            <button
-                id="close-account"
-                type="button"
-                class="modal-close"
-                aria-label="Close account panel">
+            <button id="close-account" type="button"
+                class="modal-close" aria-label="Close account panel">
                 &times;
             </button>
 
@@ -88,54 +90,30 @@
 
             <form id="signup-form">
                 <label for="signup-name">Your name</label>
-                <input
-                    id="signup-name"
-                    name="name"
-                    type="text"
-                    autocomplete="name"
-                    placeholder="Enter your name"
-                    required>
+                <input id="signup-name" name="name" type="text"
+                    autocomplete="name" placeholder="Enter your name" required>
 
                 <label for="signup-email">Email</label>
-                <input
-                    id="signup-email"
-                    name="email"
-                    type="email"
-                    autocomplete="email"
-                    placeholder="Enter your email"
-                    required>
+                <input id="signup-email" name="email" type="email"
+                    autocomplete="email" placeholder="Enter your email" required>
 
                 <label for="signup-password">Password</label>
-                <input
-                    id="signup-password"
-                    name="password"
-                    type="password"
-                    autocomplete="new-password"
-                    minlength="6"
-                    placeholder="Create a password"
-                    required>
+                <input id="signup-password" name="password" type="password"
+                    autocomplete="new-password" minlength="6"
+                    placeholder="Create a password" required>
 
                 <button type="submit">Create account</button>
             </form>
 
             <form id="login-form" hidden>
                 <label for="login-email">Email</label>
-                <input
-                    id="login-email"
-                    name="email"
-                    type="email"
-                    autocomplete="email"
-                    placeholder="Enter your email"
-                    required>
+                <input id="login-email" name="email" type="email"
+                    autocomplete="email" placeholder="Enter your email" required>
 
                 <label for="login-password">Password</label>
-                <input
-                    id="login-password"
-                    name="password"
-                    type="password"
+                <input id="login-password" name="password" type="password"
                     autocomplete="current-password"
-                    placeholder="Enter your password"
-                    required>
+                    placeholder="Enter your password" required>
 
                 <button type="submit">Log in</button>
             </form>
