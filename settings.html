@@ -3,33 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings | Planora</title>
+    <title>Planora - Settings</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js" defer></script>
 </head>
 <body>
-    <nav class="navbar">
-        <a href="index.html" class="logo">Planora</a>
-        <div class="nav-links">
-            <a href="index.html">Home</a>
+    <header class="navbar">
+        <a class="logo" href="index.html">Planora</a>
+        <nav class="nav-links" aria-label="Main navigation">
+            <a href="index.html">Dashboard</a>
             <a href="tasks.html">Tasks</a>
             <a href="schedule.html">Schedule</a>
             <a href="pomodoro.html">Pomodoro</a>
             <a href="progress.html">Progress</a>
-            <a href="settings.html" class="active">Settings</a>
-        </div>
-        <button type="button" id="account-button" class="secondary-button">Account</button>
-    </nav>
+            <a class="active" href="settings.html" aria-current="page">Settings</a>
+        </nav>
+        <button class="profile" id="account-button" type="button"
+            aria-label="Sign up or log in">U</button>
+    </header>
 
     <main class="container settings-page">
         <section class="welcome">
             <h1>Settings</h1>
-            <p>Personalise your Planora experience and customise your focus sessions.</p>
-        </header>
+            <p>Personalise Planora to suit your study habits.</p>
+        </section>
 
         <form id="settings-form" class="settings-form">
-
             <section class="card settings-group">
                 <div class="settings-section-heading">
                     <h2>Appearance</h2>
@@ -54,22 +54,26 @@
 
                 <div class="settings-field">
                     <label for="focus-duration">Focus duration (minutes)</label>
-                    <input type="number" id="focus-duration" name="focus-duration" min="1" max="120" value="25">
+                    <input type="number" id="focus-duration" name="focus-duration"
+                        min="1" max="120" value="25" required>
                 </div>
 
                 <div class="settings-field">
                     <label for="break-duration">Short break (minutes)</label>
-                    <input type="number" id="break-duration" name="break-duration" min="1" max="60" value="5">
+                    <input type="number" id="break-duration" name="break-duration"
+                        min="1" max="60" value="5" required>
                 </div>
 
                 <div class="settings-field">
                     <label for="long-break-duration">Long break (minutes)</label>
-                    <input type="number" id="long-break-duration" name="long-break-duration" min="1" max="60" value="15">
+                    <input type="number" id="long-break-duration"
+                        name="long-break-duration" min="1" max="60" value="15" required>
                 </div>
 
                 <div class="settings-field">
                     <label for="sessions-before-long-break">Focus sessions before a long break</label>
-                    <input type="number" id="sessions-before-long-break" name="sessions-before-long-break" min="2" max="10" value="4">
+                    <input type="number" id="sessions-before-long-break"
+                        name="sessions-before-long-break" min="2" max="10" value="4" required>
                 </div>
             </section>
 
@@ -80,24 +84,29 @@
                 </div>
 
                 <label class="settings-checkbox" for="auto-start-breaks">
-                    <input type="checkbox" id="auto-start-breaks" name="auto-start-breaks">
+                    <input type="checkbox" id="auto-start-breaks"
+                        name="auto-start-breaks">
                     <span>Automatically start breaks</span>
                 </label>
 
                 <label class="settings-checkbox" for="auto-start-focus">
-                    <input type="checkbox" id="auto-start-focus" name="auto-start-focus">
+                    <input type="checkbox" id="auto-start-focus"
+                        name="auto-start-focus">
                     <span>Automatically start the next focus session</span>
                 </label>
 
                 <label class="settings-checkbox" for="sound-notifications">
-                    <input type="checkbox" id="sound-notifications" name="sound-notifications" checked>
+                    <input type="checkbox" id="sound-notifications"
+                        name="sound-notifications" checked>
                     <span>Enable sound notifications</span>
                 </label>
             </section>
 
             <div class="settings-actions">
                 <button type="submit" id="save-settings">Save Settings</button>
-                <button type="button" id="reset-settings" class="secondary-button">Reset to Defaults</button>
+                <button type="button" id="reset-settings" class="secondary-button">
+                    Reset to Defaults
+                </button>
             </div>
 
             <p id="settings-message" role="status" aria-live="polite"></p>
@@ -107,23 +116,16 @@
     <div id="account-modal" class="modal" hidden>
         <div class="modal-backdrop" id="modal-backdrop"></div>
 
-        <section
-            class="modal-content card"
+        <section class="modal-content card"
             role="dialog"
             aria-modal="true"
             aria-labelledby="account-title"
             aria-describedby="account-description">
 
-            <button
-                id="close-account"
-                type="button"
-                class="modal-close"
-                aria-label="Close account panel">
-                &times;
-            </button>
+            <button id="close-account" type="button" class="modal-close"
+                aria-label="Close account panel">&times;</button>
 
             <h2 id="account-title">Create your account</h2>
-
             <p id="account-description">
                 Enter your details to get started with Planora.
             </p>
@@ -135,54 +137,30 @@
 
             <form id="signup-form">
                 <label for="signup-name">Your name</label>
-                <input
-                    id="signup-name"
-                    name="name"
-                    type="text"
-                    autocomplete="name"
-                    placeholder="Enter your name"
-                    required>
+                <input id="signup-name" name="name" type="text"
+                    autocomplete="name" placeholder="Enter your name" required>
 
                 <label for="signup-email">Email</label>
-                <input
-                    id="signup-email"
-                    name="email"
-                    type="email"
-                    autocomplete="email"
-                    placeholder="Enter your email"
-                    required>
+                <input id="signup-email" name="email" type="email"
+                    autocomplete="email" placeholder="Enter your email" required>
 
                 <label for="signup-password">Password</label>
-                <input
-                    id="signup-password"
-                    name="password"
-                    type="password"
-                    autocomplete="new-password"
-                    minlength="6"
-                    placeholder="Create a password"
-                    required>
+                <input id="signup-password" name="password" type="password"
+                    autocomplete="new-password" minlength="6"
+                    placeholder="Create a password" required>
 
                 <button type="submit">Create account</button>
             </form>
 
             <form id="login-form" hidden>
                 <label for="login-email">Email</label>
-                <input
-                    id="login-email"
-                    name="email"
-                    type="email"
-                    autocomplete="email"
-                    placeholder="Enter your email"
-                    required>
+                <input id="login-email" name="email" type="email"
+                    autocomplete="email" placeholder="Enter your email" required>
 
                 <label for="login-password">Password</label>
-                <input
-                    id="login-password"
-                    name="password"
-                    type="password"
+                <input id="login-password" name="password" type="password"
                     autocomplete="current-password"
-                    placeholder="Enter your password"
-                    required>
+                    placeholder="Enter your password" required>
 
                 <button type="submit">Log in</button>
             </form>
