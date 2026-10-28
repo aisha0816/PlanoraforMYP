@@ -704,9 +704,7 @@ let timerDuration = 25 * 60;
 let timerRemaining = timerDuration;
 let timerEndTime = null;
 let timerRunning = false;
-let completedFocusSessions = Number(
-    localStorage.getItem("planora-completed-sessions") || 0
-);
+let completedFocusSessions = 0;
 
 function formatTimerTime(seconds) {
     const minutes = Math.floor(seconds / 60);
@@ -774,18 +772,73 @@ function switchTimerPhase(phase, message) {
     }
 }
 
-function finishTimerPhase() {
+async function loadCompletedFocusSessions() {
+    const user = await getCurrentUser();
+
+    if (!user) {
+        completedFocusSessions = 0;
+        return;
+    }
+
+    const { count, error } = await supabaseClient
+        .from("pomodoro_sessions")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id);
+
+    if (error) {
+        console.error("Error loading Pomodoro sessions:", error);
+        return;
+    }
+
+    completedFocusSessions = count ?? 0;
+}
+
+async function saveCompletedFocusSession() {
+    const user = await getCurrentUser();
+
+    if (!user) {
+        if (timerMessage) {
+            timerMessage.textContent =
+                "Focus session complete! Log in to save your progress.";
+        }
+
+        return false;
+    }
+
+    const { error } = await supabaseClient
+        .from("pomodoro_sessions")
+        .insert({ user_id: user.id });
+
+    if (error) {
+        console.error("Error saving Pomodoro session:", error);
+
+        if (timerMessage) {
+            timerMessage.textContent =
+                "Session complete, but progress could not be saved.";
+        }
+
+        return false;
+    }
+
+    completedFocusSessions += 1;
+    return true;
+}
+
+async function finishTimerPhase() {
     stopTimerInterval();
     timerRunning = false;
     timerEndTime = null;
 
     if (timerPhase === "focus") {
-        completedFocusSessions += 1;
+        const saved = await saveCompletedFocusSession();
 
-        localStorage.setItem(
-            "planora-completed-sessions",
-            String(completedFocusSessions)
-        );
+        if (!saved) {
+            switchTimerPhase(
+                "short-break",
+                "Focus session complete! Take a 5-minute break."
+            );
+            return;
+        }
 
         if (completedFocusSessions % 4 === 0) {
             switchTimerPhase(
@@ -818,7 +871,6 @@ function tickTimer() {
 
     if (timerRemaining <= 0) {
         finishTimerPhase();
-        return;
     }
 }
 
@@ -859,7 +911,10 @@ function startTimer() {
     updateTimerButtons();
     stopTimerInterval();
     tickTimer();
-    timerInterval = setInterval(tickTimer, 250);
+
+    if (timerRunning) {
+        timerInterval = setInterval(tickTimer, 250);
+    }
 }
 
 function resetTimer() {
@@ -887,6 +942,7 @@ if (
     updateTimerMode();
     updateTimerDisplay();
     updateTimerButtons();
+    loadCompletedFocusSessions();
 
     timerStartButton.addEventListener("click", startTimer);
     timerResetButton.addEventListener("click", resetTimer);
