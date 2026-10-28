@@ -105,41 +105,90 @@
     </main>
 
     <div id="account-modal" class="modal" hidden>
-        <div class="modal-content">
-            <button type="button" id="close-account-modal" class="modal-close" aria-label="Close account window">&times;</button>
-            <h2>Account</h2>
+        <div class="modal-backdrop" id="modal-backdrop"></div>
 
-            <div id="logged-out-view">
-                <h3>Create an account</h3>
-                <form id="signup-form">
-                    <label for="signup-email">Email</label>
-                    <input type="email" id="signup-email" required>
+        <section
+            class="modal-content card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="account-title"
+            aria-describedby="account-description">
 
-                    <label for="signup-password">Password</label>
-                    <input type="password" id="signup-password" required minlength="6">
+            <button
+                id="close-account"
+                type="button"
+                class="modal-close"
+                aria-label="Close account panel">
+                &times;
+            </button>
 
-                    <button type="submit">Sign Up</button>
-                </form>
+            <h2 id="account-title">Create your account</h2>
 
-                <h3>Log in</h3>
-                <form id="login-form">
-                    <label for="login-email">Email</label>
-                    <input type="email" id="login-email" required>
+            <p id="account-description">
+                Enter your details to get started with Planora.
+            </p>
 
-                    <label for="login-password">Password</label>
-                    <input type="password" id="login-password" required>
-
-                    <button type="submit">Log In</button>
-                </form>
+            <div class="auth-tabs">
+                <button id="show-signup" type="button">Sign up</button>
+                <button id="show-login" type="button">Log in</button>
             </div>
 
-            <div id="logged-in-view" hidden>
-                <p id="account-email"></p>
-                <button type="button" id="logout-button">Log Out</button>
-            </div>
+            <form id="signup-form">
+                <label for="signup-name">Your name</label>
+                <input
+                    id="signup-name"
+                    name="name"
+                    type="text"
+                    autocomplete="name"
+                    placeholder="Enter your name"
+                    required>
 
-            <p id="account-message" role="status" aria-live="polite"></p>
-        </div>
+                <label for="signup-email">Email</label>
+                <input
+                    id="signup-email"
+                    name="email"
+                    type="email"
+                    autocomplete="email"
+                    placeholder="Enter your email"
+                    required>
+
+                <label for="signup-password">Password</label>
+                <input
+                    id="signup-password"
+                    name="password"
+                    type="password"
+                    autocomplete="new-password"
+                    minlength="6"
+                    placeholder="Create a password"
+                    required>
+
+                <button type="submit">Create account</button>
+            </form>
+
+            <form id="login-form" hidden>
+                <label for="login-email">Email</label>
+                <input
+                    id="login-email"
+                    name="email"
+                    type="email"
+                    autocomplete="email"
+                    placeholder="Enter your email"
+                    required>
+
+                <label for="login-password">Password</label>
+                <input
+                    id="login-password"
+                    name="password"
+                    type="password"
+                    autocomplete="current-password"
+                    placeholder="Enter your password"
+                    required>
+
+                <button type="submit">Log in</button>
+            </form>
+
+            <p id="auth-message" role="status" aria-live="polite"></p>
+        </section>
     </div>
 </body>
 </html>
