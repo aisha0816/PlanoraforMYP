@@ -27,6 +27,34 @@ if (typeof supabase === "undefined") {
     console.log("Supabase client initialised!");
 }
 
+async function restoreAccountButton() {
+    if (!accountButton || !supabaseClient) return;
+
+    const { data, error } = await supabaseClient.auth.getSession();
+
+    if (error) {
+        console.error("Session restore error:", error);
+        return;
+    }
+
+    const user = data.session?.user;
+
+    if (user) {
+        const name = user.user_metadata?.full_name;
+        accountButton.textContent =
+            name?.charAt(0)?.toUpperCase() ||
+            user.email?.charAt(0)?.toUpperCase() ||
+            "U";
+
+        accountButton.setAttribute("aria-label", "Account signed in");
+    } else {
+        accountButton.textContent = "U";
+        accountButton.setAttribute("aria-label", "Sign up or log in");
+    }
+}
+
+restoreAccountButton();
+
 if (accountButton && accountModal && supabaseClient) {
     const closeButton = document.getElementById("close-account");
     const backdrop = document.getElementById("modal-backdrop");
