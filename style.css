@@ -239,8 +239,6 @@ a:focus-visible {
     outline-offset: 2px;
 }
 
-/* Add class="active" to the current page's nav link. */
-
 .nav-links a.active,
 .nav-links a[aria-current="page"] {
     color: var(--primary-dark);
@@ -1240,5 +1238,164 @@ label {
 @media (max-width: 650px) {
     #schedule-form button {
         width: 100%;
+    }
+}
+
+.container {
+    width: min(1180px, 100%);
+    padding: 26px 24px 40px;
+}
+
+.container > section {
+    margin-bottom: 18px;
+}
+
+.welcome {
+    padding: 25px 28px;
+    border-radius: 18px;
+}
+
+.welcome h1 {
+    margin-bottom: 6px;
+}
+
+.welcome p {
+    line-height: 1.55;
+}
+
+.summary {
+    gap: 14px;
+    margin: 18px 0 22px;
+}
+
+.card {
+    padding: 19px;
+    border-radius: 14px;
+}
+
+.container > .card {
+    margin-bottom: 16px;
+}
+
+.container section > h2 {
+    margin-bottom: 10px;
+    font-size: 21px;
+}
+
+.section-heading {
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.task-form,
+#schedule-form,
+#settings-form {
+    gap: 10px;
+    margin: 14px 0;
+    padding: 15px;
+}
+
+.task-list li {
+    margin-bottom: 8px;
+    padding: 12px 14px;
+}
+
+.deadlines {
+    margin-top: 18px;
+}
+
+.deadlines p {
+    padding: 12px 4px;
+}
+
+#schedule-list {
+    gap: 9px;
+    margin-top: 14px;
+}
+
+#schedule-list li {
+    gap: 6px;
+    padding: 14px;
+}
+
+#timer-display {
+    margin: 18px 0;
+}
+
+#timer-mode {
+    margin-bottom: 18px;
+}
+
+#goal-progress {
+    margin: 10px 0;
+}
+
+#weekly-reflection {
+    min-height: 100px;
+}
+
+.modal-content {
+    padding: 24px;
+}
+
+.auth-tabs {
+    margin: 15px 0;
+}
+
+.modal-content form {
+    gap: 7px;
+}
+
+.modal-content form input {
+    margin-bottom: 4px;
+}
+
+@media (min-width: 651px) {
+    .navbar {
+        gap: 16px;
+        padding: 12px 3%;
+    }
+
+    .nav-links {
+        gap: 3px;
+    }
+
+    .nav-links a {
+        padding: 8px 10px;
+    }
+}
+
+@media (max-width: 650px) {
+    .navbar {
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 12px 16px;
+    }
+
+    .container {
+        padding: 18px 14px 30px;
+    }
+
+    .welcome {
+        padding: 21px 18px;
+    }
+
+    .summary {
+        gap: 9px;
+        margin: 14px 0 18px;
+    }
+
+    .card {
+        padding: 16px;
+    }
+
+    .container > .card {
+        margin-bottom: 12px;
+    }
+
+    .task-form,
+    #schedule-form,
+    #settings-form {
+        padding: 12px;
     }
 }
