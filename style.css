@@ -1928,3 +1928,45 @@ label {
     box-shadow: none;
 }
 
+
+.settings-page .settings-field:has(#reminder-7) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 24px;
+    align-items: start;
+}
+
+.settings-page .settings-field:has(#reminder-7) > p {
+    grid-column: 1 / -1;
+    margin: 0;
+}
+
+.settings-page .settings-field:has(#reminder-7) > label {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding: 0 0 12px;
+    border-bottom: 1px solid var(--border-color, #d9e2ef);
+}
+
+.settings-page .settings-field:has(#reminder-7) > label input {
+    flex: 0 0 16px;
+    margin-top: 4px;
+}
+
+.settings-page .settings-field:has(#reminder-7) > label span {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 480px) {
+    .settings-page .settings-field:has(#reminder-7) {
+        grid-template-columns: 1fr;
+    }
+}
