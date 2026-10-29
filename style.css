@@ -2041,3 +2041,16 @@ label {
 .settings-page .settings-group:has(#reminder-enabled) .settings-section-heading {
     margin-bottom: 0px;
 }
+
+.settings-page .settings-group:has(#reminder-enabled) .settings-section-heading {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.settings-page .settings-group:has(#reminder-enabled) .settings-section-heading p {
+    margin-bottom: 0 !important;
+}
+
+.settings-page .settings-group:has(#reminder-enabled) > label[for="reminder-enabled"] {
+    margin-top: -4px !important;
+}
