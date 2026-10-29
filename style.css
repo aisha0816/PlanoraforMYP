@@ -1970,3 +1970,30 @@ label {
         grid-template-columns: 1fr;
     }
 }
+
+
+.settings-page label.settings-checkbox[for="reminder-enabled"] {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 12px;
+    padding: 0;
+    line-height: 1.5;
+}
+
+.settings-page label.settings-checkbox[for="reminder-enabled"] input {
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+}
+
+.settings-page .settings-field:has(#reminder-7) {
+    margin-top: 0;
+    row-gap: 12px;
+}
+
+.settings-page .settings-field:has(#reminder-7) > p {
+    margin: 0 0 2px;
+}
