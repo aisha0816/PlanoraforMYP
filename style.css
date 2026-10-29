@@ -2037,3 +2037,7 @@ label {
     margin: 0;
     padding-bottom: 6px;
 }
+
+.settings-page .settings-group:has(#reminder-enabled) .settings-section-heading {
+    margin-bottom: 2px;
+}
