@@ -1263,3 +1263,130 @@ if (saveReflectionButton) {
 if (progressTotal) {
     loadProgress();
 }
+
+const DEFAULT_PREFERENCES = {
+    theme: "blue",
+    focus_duration: 25,
+    break_duration: 5,
+    long_break_duration: 15,
+    sessions_before_long_break: 4,
+    auto_start_breaks: false,
+    auto_start_focus: false,
+    sound_notifications: true
+};
+
+const PREFERENCES_KEY = "planora-preferences";
+
+function getLocalPreferences() {
+    try {
+        const saved = localStorage.getItem(PREFERENCES_KEY);
+
+        return {
+            ...DEFAULT_PREFERENCES,
+            ...(saved ? JSON.parse(saved) : {})
+        };
+    } catch (error) {
+        console.error("Could not load local preferences:", error);
+        return { ...DEFAULT_PREFERENCES };
+    }
+}
+
+let userPreferences = getLocalPreferences();
+
+function applyTheme(theme = userPreferences.theme) {
+    const validThemes = ["blue", "light", "black"];
+    const selectedTheme = validThemes.includes(theme) ? theme : "blue";
+
+    document.body.dataset.theme = selectedTheme;
+}
+
+function saveLocalPreferences() {
+    localStorage.setItem(
+        PREFERENCES_KEY,
+        JSON.stringify(userPreferences)
+    );
+
+    applyTheme();
+}
+
+async function loadUserPreferences() {
+    applyTheme();
+
+    if (!supabaseClient) return;
+
+    const user = await getCurrentUser();
+
+    if (!user) return;
+
+    const { data, error } = await supabaseClient
+        .from("user_preferences")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+    if (error) {
+        console.error("Could not load preferences:", error);
+        return;
+    }
+
+    if (data) {
+        userPreferences = {
+            ...DEFAULT_PREFERENCES,
+            theme: data.theme,
+            focus_duration: data.focus_duration,
+            break_duration: data.break_duration,
+            long_break_duration: data.long_break_duration,
+            sessions_before_long_break: data.sessions_before_long_break,
+            auto_start_breaks: data.auto_start_breaks,
+            auto_start_focus: data.auto_start_focus,
+            sound_notifications: data.sound_notifications
+        };
+    }
+
+    localStorage.setItem(
+        PREFERENCES_KEY,
+        JSON.stringify(userPreferences)
+    );
+
+    applyTheme();
+}
+
+async function saveUserPreferences() {
+    saveLocalPreferences();
+
+    const user = await getCurrentUser();
+
+    if (!user) {
+        return {
+            success: true,
+            message: "Settings saved on this browser."
+        };
+    }
+
+    const { error } = await supabaseClient
+        .from("user_preferences")
+        .upsert(
+            {
+                user_id: user.id,
+                ...userPreferences,
+                updated_at: new Date().toISOString()
+            },
+            { onConflict: "user_id" }
+        );
+
+    if (error) {
+        console.error("Could not save preferences:", error);
+
+        return {
+            success: false,
+            message: "Could not sync settings to your account."
+        };
+    }
+
+    return {
+        success: true,
+        message: "Settings saved to your account."
+    };
+}
+
+loadUserPreferences();
