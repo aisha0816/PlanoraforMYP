@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#193D68">
     <title>Planora - Settings</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -11,6 +12,7 @@
 <body>
     <header class="navbar">
         <a class="logo" href="index.html">Planora</a>
+
         <nav class="nav-links" aria-label="Main navigation">
             <a href="index.html">Dashboard</a>
             <a href="tasks.html">Tasks</a>
@@ -19,6 +21,7 @@
             <a href="progress.html">Progress</a>
             <a class="active" href="settings.html" aria-current="page">Settings</a>
         </nav>
+
         <button class="profile" id="account-button" type="button"
             aria-label="Sign up or log in">U</button>
     </header>
@@ -71,9 +74,12 @@
                 </div>
 
                 <div class="settings-field">
-                    <label for="sessions-before-long-break">Focus sessions before a long break</label>
+                    <label for="sessions-before-long-break">
+                        Focus sessions before a long break
+                    </label>
                     <input type="number" id="sessions-before-long-break"
-                        name="sessions-before-long-break" min="2" max="10" value="4" required>
+                        name="sessions-before-long-break" min="2" max="10"
+                        value="4" required>
                 </div>
             </section>
 
@@ -102,8 +108,31 @@
                 </label>
             </section>
 
+            <section class="card settings-group">
+                <div class="settings-section-heading">
+                    <h2>Notifications</h2>
+                    <p>
+                        Enable browser notifications so Planora can alert you
+                        about reminders and important updates.
+                    </p>
+                </div>
+
+                <div class="settings-field">
+                    <p id="notification-status" role="status" aria-live="polite">
+                        Checking notification support...
+                    </p>
+
+                    <button type="button" id="enable-notifications">
+                        Enable Notifications
+                    </button>
+
+                    <p id="notification-message" role="status" aria-live="polite"></p>
+                </div>
+            </section>
+
             <div class="settings-actions">
                 <button type="submit" id="save-settings">Save Settings</button>
+
                 <button type="button" id="reset-settings" class="secondary-button">
                     Reset to Defaults
                 </button>
@@ -126,6 +155,7 @@
                 aria-label="Close account panel">&times;</button>
 
             <h2 id="account-title">Create your account</h2>
+
             <p id="account-description">
                 Enter your details to get started with Planora.
             </p>
