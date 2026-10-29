@@ -1514,3 +1514,36 @@ function setupSettingsPage() {
 
 setupSettingsPage();
 loadUserPreferences();
+
+function updateNotificationStatus() {
+    const status = document.getElementById("notification-status");
+    const button = document.getElementById("enable-notifications");
+
+    if (!status || !button) return;
+
+    if (!("serviceWorker" in navigator)) {
+        status.textContent = "Service workers are not supported in this browser.";
+        button.disabled = true;
+        return;
+    }
+
+    if (!("Notification" in window)) {
+        status.textContent = "Browser notifications are not supported.";
+        button.disabled = true;
+        return;
+    }
+
+    if (Notification.permission === "granted") {
+        status.textContent = "Browser notifications are enabled.";
+        button.disabled = false;
+    } else if (Notification.permission === "denied") {
+        status.textContent =
+            "Notifications are blocked. Allow them in your browser's site settings.";
+        button.disabled = true;
+    } else {
+        status.textContent = "Notifications have not been enabled yet.";
+        button.disabled = false;
+    }
+}
+
+updateNotificationStatus();
