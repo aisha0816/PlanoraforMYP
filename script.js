@@ -1547,3 +1547,97 @@ function updateNotificationStatus() {
 }
 
 updateNotificationStatus();
+
+async function enablePlanoraNotifications() {
+    const message = document.getElementById("notification-message");
+    const button = document.getElementById("enable-notifications");
+
+    if (!message || !button) return;
+
+    if (!("serviceWorker" in navigator) || !("Notification" in window)) {
+        message.textContent = "Your browser does not support notifications.";
+        return;
+    }
+
+    button.disabled = true;
+    message.textContent = "Setting up notifications...";
+
+    try {
+        const registration = await navigator.serviceWorker.register(
+            "./service-worker.js"
+        );
+
+        await navigator.serviceWorker.ready;
+
+        let permission = Notification.permission;
+
+        if (permission === "default") {
+            permission = await Notification.requestPermission();
+        }
+
+        if (permission !== "granted") {
+            message.textContent =
+                "Notifications were not enabled. Check your browser permissions.";
+            return;
+        }
+
+        await registration.showNotification(
+            "Planora Notifications Enabled!",
+            {
+                body: "Your browser is ready to display Planora notifications."
+            }
+        );
+
+        message.textContent =
+            "Notifications enabled! Your test notification should appear.";
+    } catch (error) {
+        console.error("Notification setup failed:", error);
+        message.textContent =
+            "Setup failed. Check the browser console for details.";
+    } finally {
+        button.disabled = false;
+        updateNotificationStatus();
+    }
+}
+
+const notificationButton = document.getElementById("enable-notifications");
+
+if (notificationButton) {
+    notificationButton.addEventListener(
+        "click",
+        enablePlanoraNotifications
+    );
+}
+
+function updateNotificationStatus() {
+    const status = document.getElementById("notification-status");
+    const button = document.getElementById("enable-notifications");
+
+    if (!status || !button) return;
+
+    if (!("serviceWorker" in navigator)) {
+        status.textContent = "Service workers are not supported in this browser.";
+        button.disabled = true;
+        return;
+    }
+
+    if (!("Notification" in window)) {
+        status.textContent = "Browser notifications are not supported.";
+        button.disabled = true;
+        return;
+    }
+
+    if (Notification.permission === "granted") {
+        status.textContent = "Browser notifications are enabled.";
+        button.disabled = false;
+    } else if (Notification.permission === "denied") {
+        status.textContent =
+            "Notifications are blocked. Allow them in your browser's site settings.";
+        button.disabled = true;
+    } else {
+        status.textContent = "Notifications have not been enabled yet.";
+        button.disabled = false;
+    }
+}
+
+updateNotificationStatus();
