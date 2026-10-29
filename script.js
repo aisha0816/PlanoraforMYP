@@ -1276,14 +1276,24 @@ const DEFAULT_PREFERENCES = {
 };
 
 const PREFERENCES_KEY = "planora-preferences";
+const VALID_THEMES = ["blue", "light", "black"];
 
 function getLocalPreferences() {
     try {
         const saved = localStorage.getItem(PREFERENCES_KEY);
 
+        if (!saved) {
+            return { ...DEFAULT_PREFERENCES };
+        }
+
+        const parsed = JSON.parse(saved);
+
         return {
             ...DEFAULT_PREFERENCES,
-            ...(saved ? JSON.parse(saved) : {})
+            ...parsed,
+            theme: VALID_THEMES.includes(parsed.theme)
+                ? parsed.theme
+                : DEFAULT_PREFERENCES.theme
         };
     } catch (error) {
         console.error("Could not load local preferences:", error);
@@ -1294,23 +1304,37 @@ function getLocalPreferences() {
 let userPreferences = getLocalPreferences();
 
 function applyTheme(theme = userPreferences.theme) {
-    const validThemes = ["blue", "light", "black"];
-    const selectedTheme = validThemes.includes(theme) ? theme : "blue";
+    const selectedTheme = VALID_THEMES.includes(theme)
+        ? theme
+        : "blue";
 
+    userPreferences.theme = selectedTheme;
     document.body.dataset.theme = selectedTheme;
+
+    const themeSelect = document.getElementById("theme");
+
+    if (themeSelect && themeSelect.value !== selectedTheme) {
+        themeSelect.value = selectedTheme;
+    }
 }
 
 function saveLocalPreferences() {
-    localStorage.setItem(
-        PREFERENCES_KEY,
-        JSON.stringify(userPreferences)
-    );
+    try {
+        localStorage.setItem(
+            PREFERENCES_KEY,
+            JSON.stringify(userPreferences)
+        );
 
-    applyTheme();
+        applyTheme(userPreferences.theme);
+        return true;
+    } catch (error) {
+        console.error("Could not save local preferences:", error);
+        return false;
+    }
 }
 
 async function loadUserPreferences() {
-    applyTheme();
+    applyTheme(userPreferences.theme);
 
     if (!supabaseClient) return;
 
@@ -1332,7 +1356,9 @@ async function loadUserPreferences() {
     if (data) {
         userPreferences = {
             ...DEFAULT_PREFERENCES,
-            theme: data.theme,
+            theme: VALID_THEMES.includes(data.theme)
+                ? data.theme
+                : DEFAULT_PREFERENCES.theme,
             focus_duration: data.focus_duration,
             break_duration: data.break_duration,
             long_break_duration: data.long_break_duration,
@@ -1341,18 +1367,29 @@ async function loadUserPreferences() {
             auto_start_focus: data.auto_start_focus,
             sound_notifications: data.sound_notifications
         };
+
+        saveLocalPreferences();
     }
 
-    localStorage.setItem(
-        PREFERENCES_KEY,
-        JSON.stringify(userPreferences)
-    );
-
-    applyTheme();
+    applyTheme(userPreferences.theme);
 }
 
 async function saveUserPreferences() {
-    saveLocalPreferences();
+    const savedLocally = saveLocalPreferences();
+
+    if (!savedLocally) {
+        return {
+            success: false,
+            message: "Could not save settings in this browser."
+        };
+    }
+
+    if (!supabaseClient) {
+        return {
+            success: true,
+            message: "Settings saved on this browser."
+        };
+    }
 
     const user = await getCurrentUser();
 
@@ -1379,7 +1416,7 @@ async function saveUserPreferences() {
 
         return {
             success: false,
-            message: "Could not sync settings to your account."
+            message: "Settings saved locally, but could not sync to your account."
         };
     }
 
@@ -1389,4 +1426,25 @@ async function saveUserPreferences() {
     };
 }
 
+function setupThemeSelector() {
+    const themeSelect = document.getElementById("theme");
+
+    applyTheme(userPreferences.theme);
+
+    if (!themeSelect) return;
+
+    themeSelect.value = userPreferences.theme;
+
+    themeSelect.addEventListener("change", () => {
+        const selectedTheme = themeSelect.value;
+
+        if (!VALID_THEMES.includes(selectedTheme)) return;
+
+        userPreferences.theme = selectedTheme;
+        applyTheme(selectedTheme);
+        saveLocalPreferences();
+    });
+}
+
+setupThemeSelector();
 loadUserPreferences();
