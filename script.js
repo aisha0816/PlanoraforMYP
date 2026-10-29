@@ -1264,6 +1264,7 @@ if (progressTotal) {
     loadProgress();
 }
 
+
 const DEFAULT_PREFERENCES = {
     theme: "blue",
     focus_duration: 25,
@@ -1282,9 +1283,7 @@ function getLocalPreferences() {
     try {
         const saved = localStorage.getItem(PREFERENCES_KEY);
 
-        if (!saved) {
-            return { ...DEFAULT_PREFERENCES };
-        }
+        if (!saved) return { ...DEFAULT_PREFERENCES };
 
         const parsed = JSON.parse(saved);
 
@@ -1293,10 +1292,10 @@ function getLocalPreferences() {
             ...parsed,
             theme: VALID_THEMES.includes(parsed.theme)
                 ? parsed.theme
-                : DEFAULT_PREFERENCES.theme
+                : "blue"
         };
     } catch (error) {
-        console.error("Could not load local preferences:", error);
+        console.error("Could not load preferences:", error);
         return { ...DEFAULT_PREFERENCES };
     }
 }
@@ -1304,14 +1303,12 @@ function getLocalPreferences() {
 let userPreferences = getLocalPreferences();
 
 function applyTheme(theme = userPreferences.theme) {
-    const selectedTheme = VALID_THEMES.includes(theme)
-        ? theme
-        : "blue";
+    const selectedTheme = VALID_THEMES.includes(theme) ? theme : "blue";
 
     userPreferences.theme = selectedTheme;
     document.body.dataset.theme = selectedTheme;
 
-    const themeSelect = document.getElementById("theme");
+    const themeSelect = document.getElementById("theme-choice");
 
     if (themeSelect && themeSelect.value !== selectedTheme) {
         themeSelect.value = selectedTheme;
@@ -1328,13 +1325,34 @@ function saveLocalPreferences() {
         applyTheme(userPreferences.theme);
         return true;
     } catch (error) {
-        console.error("Could not save local preferences:", error);
+        console.error("Could not save preferences locally:", error);
         return false;
     }
 }
 
+function populateSettingsForm() {
+    const themeSelect = document.getElementById("theme-choice");
+    const focusInput = document.getElementById("focus-duration");
+    const breakInput = document.getElementById("break-duration");
+    const longBreakInput = document.getElementById("long-break-duration");
+    const sessionsInput = document.getElementById("sessions-before-long-break");
+    const autoBreaksInput = document.getElementById("auto-start-breaks");
+    const autoFocusInput = document.getElementById("auto-start-focus");
+    const soundInput = document.getElementById("sound-notifications");
+
+    if (themeSelect) themeSelect.value = userPreferences.theme;
+    if (focusInput) focusInput.value = userPreferences.focus_duration;
+    if (breakInput) breakInput.value = userPreferences.break_duration;
+    if (longBreakInput) longBreakInput.value = userPreferences.long_break_duration;
+    if (sessionsInput) sessionsInput.value = userPreferences.sessions_before_long_break;
+    if (autoBreaksInput) autoBreaksInput.checked = userPreferences.auto_start_breaks;
+    if (autoFocusInput) autoFocusInput.checked = userPreferences.auto_start_focus;
+    if (soundInput) soundInput.checked = userPreferences.sound_notifications;
+}
+
 async function loadUserPreferences() {
     applyTheme(userPreferences.theme);
+    populateSettingsForm();
 
     if (!supabaseClient) return;
 
@@ -1349,16 +1367,14 @@ async function loadUserPreferences() {
         .maybeSingle();
 
     if (error) {
-        console.error("Could not load preferences:", error);
+        console.error("Could not load preferences from Supabase:", error);
         return;
     }
 
     if (data) {
         userPreferences = {
             ...DEFAULT_PREFERENCES,
-            theme: VALID_THEMES.includes(data.theme)
-                ? data.theme
-                : DEFAULT_PREFERENCES.theme,
+            theme: VALID_THEMES.includes(data.theme) ? data.theme : "blue",
             focus_duration: data.focus_duration,
             break_duration: data.break_duration,
             long_break_duration: data.long_break_duration,
@@ -1372,12 +1388,11 @@ async function loadUserPreferences() {
     }
 
     applyTheme(userPreferences.theme);
+    populateSettingsForm();
 }
 
 async function saveUserPreferences() {
-    const savedLocally = saveLocalPreferences();
-
-    if (!savedLocally) {
+    if (!saveLocalPreferences()) {
         return {
             success: false,
             message: "Could not save settings in this browser."
@@ -1396,7 +1411,7 @@ async function saveUserPreferences() {
     if (!user) {
         return {
             success: true,
-            message: "Settings saved on this browser."
+            message: "Settings saved on this browser. Log in to sync across devices."
         };
     }
 
@@ -1412,11 +1427,11 @@ async function saveUserPreferences() {
         );
 
     if (error) {
-        console.error("Could not save preferences:", error);
+        console.error("Could not sync preferences:", error);
 
         return {
             success: false,
-            message: "Settings saved locally, but could not sync to your account."
+            message: "Saved locally, but syncing failed. Check the console."
         };
     }
 
@@ -1426,25 +1441,76 @@ async function saveUserPreferences() {
     };
 }
 
-function setupThemeSelector() {
-    const themeSelect = document.getElementById("theme");
+function setupSettingsPage() {
+    const form = document.getElementById("settings-form");
+    const themeSelect = document.getElementById("theme-choice");
+    const resetButton = document.getElementById("reset-settings");
+    const message = document.getElementById("settings-message");
 
+    if (!form) return;
+
+    populateSettingsForm();
     applyTheme(userPreferences.theme);
 
-    if (!themeSelect) return;
+    if (themeSelect) {
+        themeSelect.addEventListener("change", () => {
+            if (!VALID_THEMES.includes(themeSelect.value)) return;
 
-    themeSelect.value = userPreferences.theme;
+            userPreferences.theme = themeSelect.value;
+            applyTheme(themeSelect.value);
+            saveLocalPreferences();
+        });
+    }
 
-    themeSelect.addEventListener("change", () => {
-        const selectedTheme = themeSelect.value;
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
 
-        if (!VALID_THEMES.includes(selectedTheme)) return;
+        userPreferences.theme = themeSelect.value;
+        userPreferences.focus_duration = Number(
+            document.getElementById("focus-duration").value
+        );
+        userPreferences.break_duration = Number(
+            document.getElementById("break-duration").value
+        );
+        userPreferences.long_break_duration = Number(
+            document.getElementById("long-break-duration").value
+        );
+        userPreferences.sessions_before_long_break = Number(
+            document.getElementById("sessions-before-long-break").value
+        );
+        userPreferences.auto_start_breaks =
+            document.getElementById("auto-start-breaks").checked;
+        userPreferences.auto_start_focus =
+            document.getElementById("auto-start-focus").checked;
+        userPreferences.sound_notifications =
+            document.getElementById("sound-notifications").checked;
 
-        userPreferences.theme = selectedTheme;
-        applyTheme(selectedTheme);
-        saveLocalPreferences();
+        applyTheme(userPreferences.theme);
+
+        const result = await saveUserPreferences();
+
+        if (message) {
+            message.textContent = result.message;
+        }
     });
+
+    if (resetButton) {
+        resetButton.addEventListener("click", async () => {
+            userPreferences = { ...DEFAULT_PREFERENCES };
+
+            populateSettingsForm();
+            applyTheme(userPreferences.theme);
+
+            const result = await saveUserPreferences();
+
+            if (message) {
+                message.textContent = result.success
+                    ? "Settings reset to defaults. " + result.message
+                    : result.message;
+            }
+        });
+    }
 }
 
-setupThemeSelector();
+setupSettingsPage();
 loadUserPreferences();
