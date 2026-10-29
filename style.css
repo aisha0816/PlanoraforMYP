@@ -1905,3 +1905,26 @@ label {
     max-width: 100%;
 }
 
+
+.settings-page .settings-checkbox {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    border-bottom: none;
+    box-shadow: none;
+    outline: none;
+}
+
+.settings-page .settings-checkbox span {
+    box-sizing: border-box;
+    width: 100%;
+    border-bottom: none;
+    box-shadow: none;
+}
+
+.settings-page .settings-field > label {
+    box-sizing: border-box;
+    border-bottom: none;
+    box-shadow: none;
+}
+
