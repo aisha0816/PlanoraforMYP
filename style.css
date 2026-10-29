@@ -1850,3 +1850,36 @@ label {
     }
 }
 
+
+.settings-page .settings-checkbox {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 10px;
+    text-align: left;
+}
+
+.settings-page .settings-checkbox input[type="checkbox"] {
+    display: inline-block;
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    margin: 4px 0 0;
+    padding: 0;
+}
+
+.settings-page .settings-checkbox span {
+    display: inline-block;
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+}
+
+.settings-page .settings-field label:has(input[type="checkbox"]) {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 10px;
+}
+
