@@ -2,6 +2,9 @@ const SUPABASE_URL = "https://oxyiaqomqvzmgrsagroc.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY =
     "sb_publishable_4A95N9DBr72t7DStUrOrHw__Jn9f_gz";
 
+const VAPID_PUBLIC_KEY =
+    "BEdHRm3JaUxGjRMksEf44PFBjrpBLr4u2Ry7q3DtQkMsnYuZpQxYWZUEVzTtZibjsTF62dJXgE8GrEPeTbsBu4o";
+
 let supabaseClient = null;
 
 const accountButton = document.getElementById("account-button");
@@ -429,7 +432,6 @@ if (taskForm && taskList && supabaseClient) {
 
     loadTasks();
 }
-
 
 async function toggleTaskCompletion(task) {
     const user = await getCurrentUser();
@@ -1062,12 +1064,19 @@ async function loadProgress() {
         progressTodayTasks.textContent = "0";
         progressTodayFocus.textContent = "0";
 
-        goalDescription.textContent =
-            "Log in and add tasks with due dates to track your daily goal.";
+        if (goalDescription) {
+            goalDescription.textContent =
+                "Log in and add tasks with due dates to track your daily goal.";
+        }
 
-        goalProgress.max = 1;
-        goalProgress.value = 0;
-        goalCount.textContent = "0 tasks completed today";
+        if (goalProgress) {
+            goalProgress.max = 1;
+            goalProgress.value = 0;
+        }
+
+        if (goalCount) {
+            goalCount.textContent = "0 tasks completed today";
+        }
 
         if (weeklyReflection) {
             weeklyReflection.value = "";
@@ -1165,24 +1174,26 @@ async function loadProgress() {
     progressTodayTasks.textContent = completedToday;
     progressTodayFocus.textContent = focusSessionsToday;
 
-    if (dailyGoal === 0) {
-        goalDescription.textContent =
-            "No tasks are due today. Add a due date to a task to create your daily goal.";
+    if (goalProgress && goalDescription && goalCount) {
+        if (dailyGoal === 0) {
+            goalDescription.textContent =
+                "No tasks are due today. Add a due date to a task to create your daily goal.";
 
-        goalProgress.max = 1;
-        goalProgress.value = 0;
-        goalCount.textContent = "0 tasks completed toward today's goal";
-    } else {
-        goalProgress.max = dailyGoal;
-        goalProgress.value = completedDueToday;
+            goalProgress.max = 1;
+            goalProgress.value = 0;
+            goalCount.textContent = "0 tasks completed toward today's goal";
+        } else {
+            goalProgress.max = dailyGoal;
+            goalProgress.value = completedDueToday;
 
-        goalDescription.textContent =
-            completedDueToday === dailyGoal
-                ? "You have completed every task due today. Great work!"
-                : "Complete your tasks due today to reach your daily goal.";
+            goalDescription.textContent =
+                completedDueToday === dailyGoal
+                    ? "You have completed every task due today. Great work!"
+                    : "Complete your tasks due today to reach your daily goal.";
 
-        goalCount.textContent =
-            `${completedDueToday} of ${dailyGoal} tasks completed`;
+            goalCount.textContent =
+                `${completedDueToday} of ${dailyGoal} tasks completed`;
+        }
     }
 
     if (progressStatus) {
@@ -1198,15 +1209,7 @@ if (saveReflectionButton) {
         const user = await getCurrentUser();
 
         if (!user) {
-            if (typeof promptLogin === "function") {
-                promptLogin();
-            }
-
-            const showLoginButton = document.getElementById("show-login");
-
-            if (showLoginButton) {
-                showLoginButton.click();
-            }
+            promptLogin();
 
             if (reflectionStatus) {
                 reflectionStatus.textContent =
@@ -1216,11 +1219,16 @@ if (saveReflectionButton) {
             return;
         }
 
+        if (!weeklyReflection) return;
+
         const reflection = weeklyReflection.value.trim();
 
         if (!reflection) {
-            reflectionStatus.textContent =
-                "Write a reflection before saving.";
+            if (reflectionStatus) {
+                reflectionStatus.textContent =
+                    "Write a reflection before saving.";
+            }
+
             weeklyReflection.focus();
             return;
         }
@@ -1228,42 +1236,57 @@ if (saveReflectionButton) {
         const weekStart = progressWeekStart();
 
         saveReflectionButton.disabled = true;
-        reflectionStatus.textContent = "Saving your reflection...";
 
-        const { error } = await supabaseClient
-            .from("weekly_reflections")
-            .upsert(
-                {
-                    user_id: user.id,
-                    week_start: weekStart,
-                    reflection: reflection,
-                    updated_at: new Date().toISOString()
-                },
-                {
-                    onConflict: "user_id,week_start"
-                }
-            );
-
-        saveReflectionButton.disabled = false;
-
-        if (error) {
-            console.error("Could not save weekly reflection:", error);
-
-            reflectionStatus.textContent =
-                "Could not save your reflection. Please try again.";
-
-            return;
+        if (reflectionStatus) {
+            reflectionStatus.textContent = "Saving your reflection...";
         }
 
-        reflectionStatus.textContent =
-            "Your weekly reflection has been saved!";
+        try {
+            const { error } = await supabaseClient
+                .from("weekly_reflections")
+                .upsert(
+                    {
+                        user_id: user.id,
+                        week_start: weekStart,
+                        reflection,
+                        updated_at: new Date().toISOString()
+                    },
+                    {
+                        onConflict: "user_id,week_start"
+                    }
+                );
+
+            if (error) {
+                console.error("Could not save weekly reflection:", error);
+
+                if (reflectionStatus) {
+                    reflectionStatus.textContent =
+                        "Could not save your reflection. Please try again.";
+                }
+
+                return;
+            }
+
+            if (reflectionStatus) {
+                reflectionStatus.textContent =
+                    "Your weekly reflection has been saved!";
+            }
+        } catch (error) {
+            console.error("Reflection connection error:", error);
+
+            if (reflectionStatus) {
+                reflectionStatus.textContent =
+                    "Connection failed. Please try again.";
+            }
+        } finally {
+            saveReflectionButton.disabled = false;
+        }
     });
 }
 
 if (progressTotal) {
     loadProgress();
 }
-
 
 const DEFAULT_PREFERENCES = {
     theme: "blue",
@@ -1465,7 +1488,7 @@ function setupSettingsPage() {
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
 
-        userPreferences.theme = themeSelect.value;
+        userPreferences.theme = themeSelect?.value || "blue";
         userPreferences.focus_duration = Number(
             document.getElementById("focus-duration").value
         );
@@ -1494,26 +1517,38 @@ function setupSettingsPage() {
         }
     });
 
-    if (resetButton) {
-        resetButton.addEventListener("click", async () => {
-            userPreferences = { ...DEFAULT_PREFERENCES };
+    resetButton?.addEventListener("click", async () => {
+        userPreferences = { ...DEFAULT_PREFERENCES };
 
-            populateSettingsForm();
-            applyTheme(userPreferences.theme);
+        populateSettingsForm();
+        applyTheme(userPreferences.theme);
 
-            const result = await saveUserPreferences();
+        const result = await saveUserPreferences();
 
-            if (message) {
-                message.textContent = result.success
-                    ? "Settings reset to defaults. " + result.message
-                    : result.message;
-            }
-        });
-    }
+        if (message) {
+            message.textContent = result.success
+                ? "Settings reset to defaults. " + result.message
+                : result.message;
+        }
+    });
 }
 
 setupSettingsPage();
 loadUserPreferences();
+
+function urlBase64ToUint8Array(base64String) {
+    const padding = "=".repeat((4 - base64String.length % 4) % 4);
+
+    const base64 = (base64String + padding)
+        .replace(/-/g, "+")
+        .replace(/_/g, "/");
+
+    const rawData = window.atob(base64);
+
+    return Uint8Array.from(
+        Array.from(rawData, character => character.charCodeAt(0))
+    );
+}
 
 function updateNotificationStatus() {
     const status = document.getElementById("notification-status");
@@ -1521,8 +1556,9 @@ function updateNotificationStatus() {
 
     if (!status || !button) return;
 
-    if (!("serviceWorker" in navigator)) {
-        status.textContent = "Service workers are not supported in this browser.";
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+        status.textContent =
+            "Push notifications are not supported in this browser.";
         button.disabled = true;
         return;
     }
@@ -1533,20 +1569,20 @@ function updateNotificationStatus() {
         return;
     }
 
-    if (Notification.permission === "granted") {
-        status.textContent = "Browser notifications are enabled.";
-        button.disabled = false;
-    } else if (Notification.permission === "denied") {
+    if (Notification.permission === "denied") {
         status.textContent =
             "Notifications are blocked. Allow them in your browser's site settings.";
         button.disabled = true;
+    } else if (Notification.permission === "granted") {
+        status.textContent =
+            "Browser permission is allowed. Connect this device to your Planora account below.";
+        button.disabled = false;
     } else {
-        status.textContent = "Notifications have not been enabled yet.";
+        status.textContent =
+            "Notifications have not been enabled on this device yet.";
         button.disabled = false;
     }
 }
-
-updateNotificationStatus();
 
 async function enablePlanoraNotifications() {
     const message = document.getElementById("notification-message");
@@ -1554,20 +1590,40 @@ async function enablePlanoraNotifications() {
 
     if (!message || !button) return;
 
-    if (!("serviceWorker" in navigator) || !("Notification" in window)) {
-        message.textContent = "Your browser does not support notifications.";
+    if (
+        !("serviceWorker" in navigator) ||
+        !("PushManager" in window) ||
+        !("Notification" in window)
+    ) {
+        message.textContent =
+            "This browser does not support push notifications.";
+        return;
+    }
+
+    if (!supabaseClient) {
+        message.textContent =
+            "Supabase is unavailable. Refresh the page and try again.";
         return;
     }
 
     button.disabled = true;
-    message.textContent = "Setting up notifications...";
+    message.textContent = "Checking your Planora account...";
 
     try {
-        const registration = await navigator.serviceWorker.register(
-            "./service-worker.js"
-        );
+        const user = await getCurrentUser();
 
-        await navigator.serviceWorker.ready;
+        if (!user) {
+            message.textContent =
+                "Please log in before connecting this device to notifications.";
+            promptLogin();
+            return;
+        }
+
+        message.textContent = "Registering this device...";
+
+        await navigator.serviceWorker.register("./service-worker.js");
+
+        const registration = await navigator.serviceWorker.ready;
 
         let permission = Notification.permission;
 
@@ -1581,19 +1637,78 @@ async function enablePlanoraNotifications() {
             return;
         }
 
-        await registration.showNotification(
-            "Planora Notifications Enabled!",
-            {
-                body: "Your browser is ready to display Planora notifications."
-            }
-        );
+        message.textContent = "Connecting this device to Planora...";
+
+        let subscription = await registration.pushManager.getSubscription();
+
+        if (!subscription) {
+            subscription = await registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(
+                    VAPID_PUBLIC_KEY
+                )
+            });
+        }
+
+        const subscriptionJSON = subscription.toJSON();
+
+        const { error } = await supabaseClient
+            .from("push_subscriptions")
+            .upsert(
+                {
+                    user_id: user.id,
+                    endpoint: subscription.endpoint,
+                    subscription: subscriptionJSON
+                },
+                {
+                    onConflict: "endpoint"
+                }
+            );
+
+        if (error) {
+            console.error(
+                "Could not save the push subscription:",
+                error
+            );
+
+            message.textContent =
+                "The device subscription was created, but saving it to your account failed. Check the console.";
+            return;
+        }
 
         message.textContent =
-            "Notifications enabled! Your test notification should appear.";
+            "This device is connected to your Planora account for push notifications.";
+
+        updateNotificationStatus();
+
+        try {
+            await registration.showNotification(
+                "Planora notifications enabled!",
+                {
+                    body: "This device is subscribed. Automatic deadline reminders still need the server-side sender and scheduler.",
+                    icon: "./favicon.ico",
+                    data: {
+                        url: "./settings.html"
+                    }
+                }
+            );
+        } catch (notificationError) {
+            console.warn(
+                "The subscription was saved, but the test notification could not be displayed:",
+                notificationError
+            );
+        }
     } catch (error) {
         console.error("Notification setup failed:", error);
-        message.textContent =
-            "Setup failed. Check the browser console for details.";
+
+        if (error.name === "NotAllowedError") {
+            message.textContent =
+                "Notification permission was denied. Check your browser's site settings.";
+        } else {
+            message.textContent =
+                error.message ||
+                "Notification setup failed. Check the browser console for details.";
+        }
     } finally {
         button.disabled = false;
         updateNotificationStatus();
@@ -1607,37 +1722,6 @@ if (notificationButton) {
         "click",
         enablePlanoraNotifications
     );
-}
-
-function updateNotificationStatus() {
-    const status = document.getElementById("notification-status");
-    const button = document.getElementById("enable-notifications");
-
-    if (!status || !button) return;
-
-    if (!("serviceWorker" in navigator)) {
-        status.textContent = "Service workers are not supported in this browser.";
-        button.disabled = true;
-        return;
-    }
-
-    if (!("Notification" in window)) {
-        status.textContent = "Browser notifications are not supported.";
-        button.disabled = true;
-        return;
-    }
-
-    if (Notification.permission === "granted") {
-        status.textContent = "Browser notifications are enabled.";
-        button.disabled = false;
-    } else if (Notification.permission === "denied") {
-        status.textContent =
-            "Notifications are blocked. Allow them in your browser's site settings.";
-        button.disabled = true;
-    } else {
-        status.textContent = "Notifications have not been enabled yet.";
-        button.disabled = false;
-    }
 }
 
 updateNotificationStatus();
