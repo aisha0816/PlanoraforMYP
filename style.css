@@ -1883,3 +1883,25 @@ label {
     gap: 10px;
 }
 
+
+.settings-page .settings-form {
+    gap: 24px;
+}
+
+.settings-page .settings-group {
+    position: relative;
+    margin: 0;
+    border: 1px solid var(--border-color, #d9e2ef);
+    border-radius: 16px;
+    box-shadow: none;
+    background-clip: padding-box;
+}
+
+.settings-page .settings-group + .settings-group {
+    margin-top: 0;
+}
+
+.settings-page .settings-group > * {
+    max-width: 100%;
+}
+
